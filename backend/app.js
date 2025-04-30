@@ -12,6 +12,10 @@ import TicketRoutes from './routes/ticket.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import Add_new_ticketRoutes from './routes/add_new_ticket.js';
+import ProfileRoutes from './routes/profile.js';
+import feedbackRoutes from './routes/feedback.js';
+import clientRoutes from './routes/client.js';
+import AdminRoutes from './routes/admin.js';
 dotenv.config();
 
 const app = express();
@@ -123,6 +127,10 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/api/auth', routes);
 app.use('/api/tickets',TicketRoutes);
 app.use('/api/tickets', Add_new_ticketRoutes);
+app.use('/api/users', ProfileRoutes);
+app.use('/api/feedback', feedbackRoutes);
+app.use('/api/clients', clientRoutes);
+app.use('/api/admin',AdminRoutes);
 // Clear sessions on startup (for testing)
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {

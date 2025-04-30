@@ -25,37 +25,28 @@ const validateRegister = (req, res, next) => {
   next();
 };
 
-const validateVerifyOtp = (req, res, next) => {
-  const schema = Joi.object({
-    email: Joi.string().email().required().messages({
-      'string.email': 'Please provide a valid email',
-      'any.required': 'Email is required'
-    }),
-    otp: Joi.string().length(6).pattern(/^[0-9]+$/).required().messages({
-      'string.length': 'OTP must be 6 digits',
-      'string.pattern.base': 'OTP must contain only digits',
-      'any.required': 'OTP is required'
-    })
-  });
-
-  const { error } = schema.validate(req.body);
-  if (error) {
-    return res.status(400).json({ error: error.details[0].message });
+ const validateVerifyOtp = (req, res, next) => {
+  const { email, otp, originalEmail } = req.body;
+  if (!email || !otp || typeof otp !== 'string' || otp.length !== 6) {
+    return res.status(400).json({ error: 'Invalid email or OTP' });
+  }
+  // originalEmail is optional but must be a valid email if provided
+  if (originalEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(originalEmail)) {
+    return res.status(400).json({ error: 'Invalid original email format' });
   }
   next();
 };
 
-const validateResendOtp = (req, res, next) => {
-  const schema = Joi.object({
-    email: Joi.string().email().required().messages({
-      'string.email': 'Please provide a valid email',
-      'any.required': 'Email is required'
-    })
-  });
-
-  const { error } = schema.validate(req.body);
-  if (error) {
-    return res.status(400).json({ error: error.details[0].message });
+ const validateResendOtp = (req, res, next) => {
+  const { email, originalEmail } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: 'Invalid email format' });
+  }
+  if (originalEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(originalEmail)) {
+    return res.status(400).json({ error: 'Invalid original email format' });
   }
   next();
 };

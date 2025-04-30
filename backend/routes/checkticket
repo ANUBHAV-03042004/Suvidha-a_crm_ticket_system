@@ -3,7 +3,7 @@ import Ticket from '../models/Ticket.js';
 import Chat from '../models/Chat.js';
 import TelegramBot from 'node-telegram-bot-api';
 import dotenv from 'dotenv';
-// import { ensureAuthenticated } from '../middleware/auth.js';
+import { ensureAuthenticated } from '../middleware/auth.js';
 dotenv.config();
 
 const router = express.Router();
@@ -22,27 +22,27 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch tickets' });
   }
 });
-// router.put('/:id', ensureAuthenticated, async (req, res) => {
-//   try {
-//     const { status } = req.body;
-//     if (!status || !['pending', 'resolved'].includes(status)) {
-//       return res.status(400).json({ error: 'Valid status (pending or resolved) is required' });
-//     }
-//     const ticket = await Ticket.findByIdAndUpdate(
-//       req.params.id,
-//       { status, updatedAt: Date.now() },
-//       { new: true }
-//     );
-//     if (!ticket) {
-//       return res.status(404).json({ error: 'Ticket not found' });
-//     }
-//     console.log('Updated ticket:', ticket);
-//     res.json({ message: 'Ticket status updated successfully', ticket });
-//   } catch (error) {
-//     console.error('Error updating ticket:', error);
-//     res.status(500).json({ error: 'Failed to update ticket' });
-//   }
-// });
+router.put('/:id', ensureAuthenticated, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!status || !['pending', 'resolved'].includes(status)) {
+      return res.status(400).json({ error: 'Valid status (pending or resolved) is required' });
+    }
+    const ticket = await Ticket.findByIdAndUpdate(
+      req.params.id,
+      { status, updatedAt: Date.now() },
+      { new: true }
+    );
+    if (!ticket) {
+      return res.status(404).json({ error: 'Ticket not found' });
+    }
+    console.log('Updated ticket:', ticket);
+    res.json({ message: 'Ticket status updated successfully', ticket });
+  } catch (error) {
+    console.error('Error updating ticket:', error);
+    res.status(500).json({ error: 'Failed to update ticket' });
+  }
+});
 
 router.delete('/:id', async (req, res) => {
   try {
@@ -102,7 +102,7 @@ bot.getMe().then((botInfo) => {
 bot.on('polling_error', (error) => console.error('Polling error:', error));
 
 // Chat configurations
-
+// Chat configurations
 const chatConfigs = {};
 const initializeChatConfigs = async () => {
   try {

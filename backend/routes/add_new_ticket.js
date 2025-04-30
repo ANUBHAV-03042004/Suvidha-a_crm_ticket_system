@@ -5,6 +5,7 @@ import Ticket from '../models/Ticket.js';
 import { ensureAuthenticated } from '../middleware/auth.js';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
+import editTicketRoutes from './editticket.js';
 
 // Ensure Uploads directory exists
 const __filename = fileURLToPath(import.meta.url);
@@ -40,6 +41,7 @@ const upload = multer({
   },
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
 });
+router.use(editTicketRoutes);
 
 // GET: Fetch all tickets for the authenticated user
 router.get('/', ensureAuthenticated, async (req, res) => {
@@ -68,8 +70,12 @@ router.post(
         return res.status(400).json({ error: 'Issue and description are required.' });
       }
 
-      const invoicePath = req.files['invoice'] ? req.files['invoice'][0].path : null;
-      const productImagePath = req.files['product_image'] ? req.files['product_image'][0].path : null;
+      const invoicePath = req.files['invoice']
+        ? `/Uploads/${req.files['invoice'][0].filename}`
+        : null;
+      const productImagePath = req.files['product_image']
+        ? `/Uploads/${req.files['product_image'][0].filename}`
+        : null;
 
       const newTicket = new Ticket({
         userId: req.user._id,

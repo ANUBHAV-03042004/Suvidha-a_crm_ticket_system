@@ -17,26 +17,27 @@ const ticketSchema = new mongoose.Schema(
       required: true,
     },
     invoice: {
-      type: String, // Store the file path or URL after upload
+      type: String,
     },
     product_image: {
-      type: String, // Store the file path or URL after upload
+      type: String, 
     },
     status: {
       type: String,
-      enum: ['pending', 'resolved'], // Define valid status values
-      default: 'pending', // Default status
+      enum: ['pending', 'resolved'], 
+      default: 'pending', 
       required: true,
     },
+    updatedAt: { type: Date, default: Date.now },
   },
   {
-    timestamps: true, // Automatically manages createdAt and updatedAt
+    timestamps: true,
   }
 );
 
 // Custom pre-save middleware to ensure updatedAt is set
 ticketSchema.pre('save', function (next) {
-  this.updatedAt = Date.now(); // Update updatedAt on every save
+  this.updatedAt = Date.now(); 
   next();
 });
 

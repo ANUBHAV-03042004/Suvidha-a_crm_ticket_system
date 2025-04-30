@@ -1,17 +1,23 @@
-// models/Admin.js
 import mongoose from 'mongoose';
 import passportLocalMongoose from 'passport-local-mongoose';
 
 const adminSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
-  secretCode: { type: String, required: true }, // Required field, no default
+  pendingEmail: { type: String },
+  secretCode: { type: String, required: true },
   isVerified: { type: Boolean, default: false },
   otp: { type: String },
   otpExpires: { type: Date },
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },
-  isAdmin: { type: Boolean, default: true }
+  isAdmin: { type: Boolean, default: true },
+});
+
+// Remove any pre-save hooks that might interfere
+adminSchema.pre('save', function (next) {
+  console.log('Saving admin document:', this);
+  next();
 });
 
 adminSchema.plugin(passportLocalMongoose, { usernameField: 'email' });
