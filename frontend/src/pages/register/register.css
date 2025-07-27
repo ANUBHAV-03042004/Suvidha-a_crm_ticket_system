@@ -1,0 +1,247 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.sh1{display: none;}
+.loglink{
+  display: flex;
+  transform: translate(60px,-50px);
+  color:black;
+}
+.loglink a{
+  color:black;
+}
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  min-width:100vw;
+}
+.register {
+  color: #000;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  display: block;
+  font-weight: bold;
+  font-size: 30px;
+  text-decoration: underline;
+ text-decoration-thickness:3px ;
+  margin-top: 1.5em;
+}
+
+.inputBox,
+.inputBox1 {
+  position: relative;
+  width: 250px ;
+}
+
+.inputBox input,
+.inputBox1 input {
+  width: 100%;
+  padding: 10px;
+  outline: none;
+  border: none;
+  color: #000;
+  font-size: 1em;
+  background:white;
+  border-left: 2px solid #000;
+  border-bottom: 2px solid #000;
+  transition: 0.1s;
+  border-bottom-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.inputBox span,
+.inputBox1 span {
+  margin-top: 5px;
+  position: absolute;
+  left: 0;
+  transform: translateY(-4px);
+  margin-left: 10px;
+  padding: 10px;
+  pointer-events: none;
+  font-size: 12px;
+  color: #000;
+  text-transform: uppercase;
+  transition: 0.5s;
+  letter-spacing: 3px;
+  border-radius: 8px;
+}
+
+.inputBox input:valid~span,
+.inputBox input:focus~span {
+  transform: translateX(113px) translateY(-25px);
+  font-size: 0.8em;
+  padding: 5px 10px;
+  background: #000;
+  letter-spacing: 0.2em;
+  color: #fff;
+  border: 2px;
+}
+
+.inputBox1 input:valid~span,
+.inputBox1 input:focus~span {
+  transform: translateX(156px) translateY(-15px);
+  font-size: 0.8em;
+  padding: 5px 10px;
+  background: #000;
+  letter-spacing: 0.2em;
+  color: #fff;
+  border: 2px;
+}
+
+.inputBox input:valid,
+.inputBox input:focus,
+.inputBox1 input:valid,
+.inputBox1 input:focus {
+  border: 2px solid #000;
+  border-radius: 8px;
+}
+
+.password-box {
+  position: relative;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: black;
+  border: none;
+  color: white;
+  border-radius:5px;
+  height:30px;
+  width:70px;
+  cursor: pointer;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 2px 5px;
+}
+
+.enter {
+  height: 45px;
+  width: 100px;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: rgb(0, 0, 0);
+  transition: 0.5s;
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 2px;
+  margin-bottom: 3em;
+  color:white;
+}
+
+.enter:hover {
+  box-shadow: 0 4px 30px rgb(19, 17, 17);
+}
+@media (min-width:270px ) and (max-width:370px){
+.container{
+  height:150vh !important;
+}
+.card{
+  margin-top: -45vh;
+}
+}
+@media (min-width:190px ) and (max-width:270px){
+  .container{
+    height:200vh !important;
+  }
+  .card{
+    margin-top: -40vh;
+  }
+}
+@media (min-width:90px ) and (max-width:190px){
+  .container{
+    height:400vh !important;
+  }
+  .card{
+    margin-top: -180vh;
+  }
+}
+
+
+
+
+
+@media (min-height:0px) and (max-height:90px){
+   
+#sh-img {
+   height: 70px;
+   width: 70px;
+   display: flex;
+   margin-left:50vh ;
+   &:hover{
+       transform: scale(1.2);
+    }
+ }
+ .sh1{
+   display: flex;
+   justify-content: center;
+   position: fixed;
+   margin-top:-390vh;
+   margin-left: 700px;
+  gap:5px;
+ }
+#sh-h6{
+   display: none;
+}
+#sh-h5{
+   text-align:right;
+   color: black;
+   font-weight: bold; 
+   font-size: 12px;
+   margin-top: 20px;
+   &:hover{
+       color:gold;
+   }
+  }
+  .comp{display: none ;}
+  .container {
+    min-height: 400vh;
+    min-width:100vw;
+  }
+}
+
+
+@media (min-width:0px) and (max-width:90px){
+   
+ 
+#sh-img {
+   height: 250px;
+   width: 250px;
+   display: block;
+margin: auto;
+&:hover{
+  transform: scale(1.2);
+}
+ }
+ .sh1{
+   display: block;
+   margin-top:-350vh !important;
+   margin-left:3vh;
+   position: fixed;
+   &:hover{
+      color:gold;
+  }
+ }
+ #sh-h5{
+  display: none;
+ }
+#sh-h6{
+  font-size: 25px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.comp{display: none;}
+
+.container {
+  min-height: 400vh;
+  min-width:500vw;
+}
+}

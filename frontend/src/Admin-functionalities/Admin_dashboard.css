@@ -1,0 +1,303 @@
+.custom-nav-admin {
+  background-color: #b782d8;
+  border-bottom: 2px solid #222631;
+  height: 12vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  width: 100%;
+  z-index: 2;
+}
+
+.nav-container {
+  width: 90%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand .hlogo {
+  height: 75px;
+}
+
+.nav-links-admin {
+  display: flex;
+  list-style: none;
+  align-items: center;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+}
+
+.nav-links-admin a {
+  color: black;
+  transition: all 0.3s ease-in-out;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.nav-links-admin a:hover {
+  transform: scale(1.05);
+}
+
+.toggle-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #222631;
+  cursor: pointer;
+}
+
+@media (max-width: 768px) {
+  .toggle-btn {
+    display: block;
+  }
+
+  .nav-links-admin {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 12vh;
+    left: 0;
+    width: 100%;
+    background-color: #b782d8;
+    padding: 10px 0;
+    z-index: 2;
+  }
+
+  .nav-links-admin.active {
+    display: flex;
+  }
+
+  .nav-links-admin li {
+    margin: 10px 0;
+    text-align: center;
+  }
+
+  .nav-item {
+    width: 100%;
+  }
+
+  .nav-links-admin a {
+    width: 100%;
+  }
+}
+ 
+  .footer-admin {
+    position: fixed; 
+    bottom: 0;
+    left: 0;
+    height: 10vh;
+    width: 100%;
+    border-top: 2px solid black;
+    background-color:#b782d8;
+     color:black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+.hlogo{
+  height: 75px;
+}
+  /* add new client start */
+.admin-add-new-client{
+margin-top:8vh;
+margin-bottom:6vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+}
+
+.client-form input,
+.client-form textarea,
+.client-form button {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid black;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  font-size: 16px;
+  width:50vw;
+}
+
+.client-form button {
+  background-color: #000;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.client-form button:hover {
+  background-color: #000;
+  color:white;
+  border:2px solid white;
+  transform: scale(0.97);
+  border-radius:15px;
+}
+.contain {
+  height: auto;
+  min-height: 120vh;
+  width: 100%;
+  padding: 10px;
+  box-sizing: border-box;
+  width:100vw;
+}
+.client-form-container {
+    width: 100%;
+    max-width: 800px; 
+    padding: 20px;
+    background-color:rgb(250, 232, 144);
+    border-radius: 8px;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border:2px solid black;
+  }
+
+  @media (max-width:400px){
+    .client-form input,
+    .client-form textarea,
+    .client-form button {
+      width:70vw;
+    }
+  }
+
+  
+  @media (max-width:800px){
+    .client-form input,
+    .client-form textarea,
+    .client-form button {
+      width:90vw;
+    }
+  }
+
+  
+.error-message {
+  color: red;
+  margin: 10px 0;
+  font-size: 14px;
+  text-align: center;
+  background-color: rgba(255, 0, 0, 0.1);
+  padding: 8px;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.success-message {
+  color: green;
+  margin: 10px 0;
+  font-size: 14px;
+  text-align: center;
+  background-color: rgba(0, 255, 0, 0.1);
+  padding: 8px;
+  border-radius: 4px;
+  width: 100%;
+}
+
+  /* add new client end */
+
+
+  /* admin dashboard css start */
+
+  @media (min-width: 0px) and (max-width: 90px) {
+    .input-container-wrapper-admin {
+     display:none ! important;
+    }
+  }
+    @media (min-height: 0px) and (max-height: 90px) {
+    .input-container-wrapper-admin {
+     display:none ! important;
+    }
+  }
+  @media (min-width: 90px) and (max-width: 330px) {
+    .input-container-wrapper-admin {
+      width:50vw !important;
+      margin-left:4vw ! important;
+    }
+  }
+        @media (min-width: 330px) and (max-width: 700px) {
+    .input-container-wrapper-admin {
+       width:35vw !important;
+    }
+  }
+      @media (min-width: 330px) and (max-width: 1100px) {
+    .input-container-wrapper-admin {
+     margin-left:3.5vw ! important;
+    }
+  }
+  @media (min-width: 1100px) and (max-width: 1260px) {
+    .input-container-wrapper-admin {
+     margin-left:2.5vw ! important;
+    }
+  }
+  @media  (max-width: 1300px) {
+    .input-container-wrapper-admin {
+      margin-left:1.7vw;
+    }
+  }
+   
+  
+    .input-container-wrapper-admin {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 35vh; 
+      width:20vw;
+      margin-top:-20vh;
+    }
+  
+    .input-container {
+      width: 220px;
+      position: relative;
+    }
+  
+    .icon {
+      position: absolute;
+      right: 10px;
+      top: calc(50% + 2px);
+      transform: translateY(calc(-50% - 5px));
+    }
+  
+    .input {
+      width: 100%;
+      height: 40px;
+      padding: 10px;
+      transition: 0.2s linear;
+      border: 2.5px solid #679ef8;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      &::placeholder {
+    color: black;
+    font-weight: bold;
+  }
+    }
+  
+    .input:focus {
+      outline: none;
+      border: 0.5px solid #679ef8;
+      box-shadow: -5px -5px 0px #679ef8;
+    }
+  
+    .input-container:hover > .icon {
+      animation: anim 1s linear infinite;
+    }
+  
+    @keyframes anim {
+      0%,
+      100% {
+        transform: translateY(calc(-50% - 5px)) scale(1);
+      }
+  
+      50% {
+        transform: translateY(calc(-50% - 5px)) scale(1.1);
+      }
+    }
+    
+  /* admin dashboard css end */

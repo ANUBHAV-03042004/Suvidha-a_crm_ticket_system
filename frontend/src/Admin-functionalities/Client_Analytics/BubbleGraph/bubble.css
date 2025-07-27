@@ -1,0 +1,87 @@
+.graph{
+    display: flex;
+}
+
+.bubble-graph-container {
+    width:70vw;
+    height: 45vw; 
+    text-align: center;
+    overflow: visible; /* Ensure bubbles aren't clipped */
+  }
+  
+  .bubble-graph {
+    margin-top:15vh;
+    height: 30vw; 
+    overflow: visible; 
+  }
+  
+  .bubble-group {
+    transform-origin: center;
+  }
+  
+  .bubble-image {
+    transition: transform 0.3s ease;
+  }
+  
+  .bubble-border {
+    fill: none;
+    stroke: #333;
+    stroke-width: 2;
+    stroke-opacity: 0.5;
+  }
+  
+  @media (max-width: 768px) {
+    .bubble-graph-container {
+      padding: 15px;
+    }
+  
+    .bubble-graph {
+      height: 500px; /* Adjusted for mobile */
+    }
+  
+    .bubble-label {
+      font-size: 12px;
+    }
+  }
+
+.bubble-circle {
+  fill: #e0e0e0; /* Light gray background */
+  stroke: #000;
+  stroke-width: 2;
+}
+
+.bubble-total-order {
+  font-size: 16px;
+  font-weight: bold;
+  fill: #000;
+}
+
+.bubble-company {
+  font-size: 14px;
+  font-weight: bold;
+  fill: #000;
+}
+
+.bubble-label {
+  font-size: 14px;
+  fill: #333;
+  font-weight: bold;
+}
+
+.bubble-group {
+  transition: transform 0.3s;
+}
+
+@keyframes revolve {
+  from {
+    transform: rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(var(--orbit-radius)) rotate(-360deg);
+  }
+}
+
+.error {
+  color: red;
+  text-align: center;
+}

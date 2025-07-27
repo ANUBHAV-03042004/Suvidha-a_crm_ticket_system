@@ -1,0 +1,12 @@
+.main{
+    height:100vh;
+    width:100vw;
+      background-color:#679ef8;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+.hover-hide:hover{
+    position: absolute;
+    transform: translateY(-50%);
+}

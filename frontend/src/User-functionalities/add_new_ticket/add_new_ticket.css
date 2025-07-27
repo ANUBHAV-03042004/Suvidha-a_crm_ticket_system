@@ -1,0 +1,393 @@
+.contain-user {
+    height: auto;
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  
+  .form-container-user {
+    width: 100%;
+    max-width: 850px; 
+    padding: 20px;
+    background-color:rgb(250, 232, 144);
+    border-radius: 8px;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border:2px solid black;
+    margin-top:5vh;
+  }
+  
+  .ticket-form input,
+  .ticket-form textarea,
+  .ticket-form button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid black;
+    border-radius: 4px;
+    font-size: 16px;
+    width:20vw;
+  }
+  
+  .ticket-form button {
+    background-color: #000;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .ticket-form button:hover {
+    background-color: #000;
+    color:white;
+    border:2px solid white;
+    transform: scale(0.97);
+    border-radius:15px;
+  }
+  .error-message{
+    background-color: #ffdede; 
+    color: #b00020; 
+  }
+  
+  /* Responsive Design */
+  @media (min-width: 1385px) {
+    .form-container-user {
+      width: 80%;
+      max-width: 950px;
+    }
+    .contain-user {   
+   margin-left:35vh;
+   width:70vw;  
+    }
+    .ticket-form input,
+    .ticket-form textarea,
+    .ticket-form button {
+      width:50vw; 
+    }
+  }
+  @media (min-width: 1270px) and (max-width:1385px){
+    .form-container-user {
+      width: 80%; 
+      max-width: 800px;
+    }
+    .contain-user {   
+   margin-left:20vh;
+   width:70vw;  
+    }
+    .ticket-form input,
+    .ticket-form textarea,
+    .ticket-form button {
+      width:50vw; 
+    }
+  }
+  @media (min-width: 1000px) and (max-width:1270px){
+    .form-container-user {
+      width: 100%; /* Default for smaller screens */
+      max-width: 800px;
+    }
+    .contain-user {   
+   margin-left:15vh;
+   width:70vw;  
+    }
+    .ticket-form input,
+    .ticket-form textarea,
+    .ticket-form button {
+      width:60vw; 
+    }
+  }
+  
+  @media (min-width: 500px) and (max-width:1000px){
+    .form-container-user {
+      width: 110%; 
+      max-width: 800px;
+    }
+    .contain-user {   
+   margin-left:15vh;
+   width:70vw;  
+    }
+    .ticket-form input,
+    .ticket-form textarea,
+    .ticket-form button {
+      width:65vw; 
+    }
+  }
+
+  @media  (max-width:500px){
+    .form-container-user {
+      width: 110%; 
+      max-width: 800px;
+    }
+    .contain-user {   
+   margin-left:15vh;
+   width:70vw;  
+    }
+    .ticket-form input,
+    .ticket-form textarea,
+    .ticket-form button {
+      width:60vw; 
+    }
+  }
+
+
+
+
+  /* edit add_new_ticket_start */
+  .contain-edit-user {
+    height: auto;
+    min-height: 120vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+  
+  .form-container-edit-user {
+    width: 100%;
+    max-width: 850px; 
+    padding: 20px;
+    background-color:rgb(250, 232, 144);
+    border-radius: 8px;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border:2px solid black;
+    margin-top:5vh;
+  }
+  .ticket-edit-form input,
+  .ticket-edit-form textarea,
+  .ticket-edit-form button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid black;
+    border-radius: 4px;
+    font-size: 16px;
+    width:20vw;
+  }
+  
+  .ticket-edit-form button {
+    background-color: #000;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .ticket-edit-form button:hover {
+    background-color: #000;
+    color:white;
+    border:2px solid white;
+    transform: scale(0.97);
+    border-radius:15px;
+  }
+  .error-message{
+    background-color: #ffdede; 
+    color: #b00020; 
+  }
+  
+  /* Responsive Design */
+  @media (min-width: 1385px) {
+    .form-container-edit-user {
+      width: 80%;
+      max-width: 950px;
+    }
+    .contain-edit-user {   
+   margin-left:35vh;
+   width:70vw;  
+    }
+    .ticket-edit-form input,
+    .ticket-edit-form textarea,
+    .ticket-edit-form button {
+      width:50vw; 
+    }
+  }
+  @media (min-width: 1270px) and (max-width:1385px){
+    .form-container-edit-user {
+      width: 80%; 
+      max-width: 800px;
+    }
+    .contain-edit-user {   
+   margin-left:20vh;
+   width:70vw;  
+    }
+    .ticket-edit-form input,
+    .ticket-edit-form textarea,
+    .ticket-edit-form button {
+      width:50vw; 
+    }
+  }
+  @media (min-width: 1000px) and (max-width:1270px){
+    .form-container-edit-user {
+      width: 100%; /* Default for smaller screens */
+      max-width: 800px;
+    }
+    .contain-edit-user {   
+   margin-left:15vh;
+   width:70vw;  
+    }
+    .ticket-edit-form input,
+    .ticket-edit-form textarea,
+    .ticket-edit-form button {
+      width:60vw; 
+    }
+  }
+  
+  @media (min-width: 500px) and (max-width:1000px){
+    .form-container-edit-user {
+      width: 110%; 
+      max-width: 800px;
+    }
+    .contain-edit-user {   
+   margin-left:15vh;
+   width:70vw;  
+    }
+    .ticket-edt-form input,
+    .ticket-edit-form textarea,
+    .ticket-edit-form button {
+      width:65vw; 
+    }
+  }
+
+  @media  (max-width:500px){
+    .form-container-edit-user {
+      width: 110%; 
+      max-width: 800px;
+    }
+    .contain-edit-user {   
+   margin-left:15vh;
+   width:70vw;  
+    }
+    .ticket-edit-form input,
+    .ticket-edit-form textarea,
+    .ticket-edit-form button {
+      width:60vw; 
+    }
+  }
+  
+  .action.view-invoice {
+    color: rgb(255, 100, 211);
+    border: none;
+  }
+  
+  .action.view-product-image {
+    color: rgb(0, 0, 0);
+    border: none;
+  }
+  
+  .error {
+    color: red;
+    margin-bottom: 15px;
+  }
+  
+  .error button {
+    margin-left: 10px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+  }
+  
+  .modal {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+  }
+  
+  .modal h3 {
+    margin-bottom: 15px;
+  }
+  
+  .modal p {
+    margin-bottom: 20px;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .confirm-btn,
+  .cancel-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .confirm-btn {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  .cancel-btn {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .image-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 5000;
+  }
+  
+  .image-modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    position: relative;
+    max-width: 90%;
+    max-height: 60vh; /* Reduced height to avoid header/footer overlap */
+    overflow-y: auto; /* Enable vertical scrolling */
+    text-align: center;
+  }
+  
+  .close-modal {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #333;
+  }
+  
+  .close-modal:hover {
+    color: #000;
+  }
+  
+  .modal-image {
+    max-width: 100%;
+    max-height: 50vh; /* Limit image height to fit within modal */
+    margin-top: 15px;
+  }
+
+/* edit ticket end */

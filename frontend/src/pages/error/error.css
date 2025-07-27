@@ -1,0 +1,13 @@
+.lError {
+    height: 100px;
+    width: 60%;
+/* border: #1a1a1a 2px solid; */
+}
+
+.error-box {
+    margin-top: 15px;
+    padding: 10px;
+    /*height: 200px;*/
+    background: lightcoral;
+    text-align: center;
+}

@@ -1,0 +1,22 @@
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+input{
+    height: 40px;
+    width: 200px;
+    background-color: white;
+    text-align: center;
+    color: black;
+}
+h1{
+    background-color: yellow;
+    width: 80vw;
+    height: 40vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-size: 10vw;
+}

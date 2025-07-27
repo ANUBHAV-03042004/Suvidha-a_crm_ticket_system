@@ -1,0 +1,195 @@
+.chat-admin{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width:100vw;
+    font-weight: bold;
+}
+
+.admin-chat-container {
+    padding: 20px;
+    max-width: 1200px;
+    width:50vw;
+    background-color:#b782d8;
+    border:2px solid black;
+  }
+  
+  .admin-chat-header {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+  }
+  .action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-btn {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.chat-btn:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}
+
+.admin-chats-header {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #333;
+  text-align: center;
+  text-transform: uppercase;
+  /* background-color: #d2edf0; */
+  background: #e5e5e5;
+  padding: 12px;
+  width: 100%;
+  border-radius: 8px 8px 0 0;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.chat-error {
+  color: red;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.table-container {
+  margin: -12vh 3vw;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  width: 94vw;
+  max-height: 500px;
+  overflow-y: auto;
+  overflow-x: auto;
+  position: relative;
+}
+
+
+.issue-table th,
+.issue-table td {
+  padding: 12px;
+  border-bottom: 8px solid #ffffff;
+}
+
+.issue-table th {
+  background-color: #d2edf0;
+  color: #333;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.issue-table .hov:hover {
+  transform: scale(1.01);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.issue-table .resolved {
+  color: green;
+  font-weight: bold;
+}
+.pending .resolved{
+  color:white;
+}
+.issue-table .not-resolved {
+  color: red;
+  font-weight: bold;
+}
+.issue-table td {
+  background-color: #efe85e;
+}
+.invoice-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.invoice-link:hover {
+  text-decoration: underline;
+}
+
+.product-thumbnail {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.image-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  position: relative;
+  max-width: 90vw;
+  max-height: 90vh;
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.modal-image {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 30px;
+  color: #333;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.modal-close:hover {
+  color: #000;
+}
+
+/* Responsive modal */
+@media (max-width: 768px) {
+  .modal-content {
+    max-width: 95vw;
+    max-height: 95vh;
+    padding: 10px;
+  }
+
+  .modal-image {
+    max-height: 75vh;
+  }
+
+  .modal-close {
+    font-size: 24px;
+    top: 5px;
+    right: 10px;
+  }
+}

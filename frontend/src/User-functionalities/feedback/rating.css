@@ -1,0 +1,163 @@
+.container-feedback {
+    display: grid;
+    place-items: start end;
+    height: 85vh;
+    width:97vw;
+   margin-top:9.5vh;
+   margin-left:1vw;
+ }
+.data_container{
+   display: flex;
+   gap:15px;
+   align-items: center;
+}
+#trump{
+   height:80vh;
+   width:40vw;
+}
+.feedback{
+    width: 50vw;
+    height:76.5vh;
+    border: 2px solid black;
+    background-color: rgb(250, 232, 144);
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    margin-bottom: 2vh;
+}
+.feedback h2, .feedback p{
+  margin-top:-2vh;
+}
+.rate-us{
+    display:flex;
+    gap:15vh;
+}
+.rate-us p{
+    margin-top:1vh;
+}
+.rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    gap: 15px;
+  }
+
+  input[type="radio"] {
+    display: none;
+  }
+
+  label {
+    cursor: pointer;
+  }
+
+  label svg {
+    width: 44px;
+    height: 44px;
+    fill: none;
+    stroke: #000;
+    stroke-width: 2px;
+    transition: fill 0.3s, transform 0.3s ease-out;
+  }
+
+  input[type="radio"]:checked ~ label svg {
+    fill: rgb(28,2,2);
+    transform: scale(1.2);
+  }
+
+
+  .rating input[type="radio"]:checked ~ label svg,
+  .rating input[type="radio"]:checked ~ label ~ label svg {
+    fill: rgb(28, 2, 2);
+  }
+  textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+  }
+  
+  
+@media (min-width: 680px) and (max-width: 1100px) {
+    .container-feedback {
+        width:100vw;
+     }
+     .feedback{
+        width: 80vw;
+    }
+}
+@media (min-width: 350px) and (max-width: 680px) {
+     .feedback{
+        width: 150vw;
+        height:105vh;
+    }
+    #trump{
+        height:105vh;
+     }
+}
+@media (min-width: 240px) and (max-width: 350px) {
+    .feedback{
+       width: 220vw;
+       height:125vh;
+   }
+   #trump{
+       height:125vh;
+    }
+}
+@media (min-width: 190px) and (max-width: 240px) {
+    .feedback{
+       width: 280vw;
+       height:175vh;
+   }
+   #trump{
+       height:175vh;
+    }
+}
+@media (min-width: 90px) and (max-width: 190px) {
+    .feedback{
+       width: 350vw;
+       height:200vh;
+   }
+   #trump{
+       height:200vh;
+    }
+}
+
+.feedback .error {
+  color: red;
+  margin: 10px 0;
+  font-size: 14px;
+  text-align: center;
+  background-color: rgba(255, 0, 0, 0.1);
+  padding: 8px;
+  border-radius: 4px;
+  width: 90%;
+  margin-top: -2vh;
+}
+
+.feedback .success {
+  color: green;
+  margin: 10px 0;
+  font-size: 14px;
+  text-align: center;
+  background-color: rgba(0, 255, 0, 0.1);
+  padding: 8px;
+  border-radius: 4px;
+  width: 90%;
+  margin-top: -2vh;
+}.error {
+  color: red;
+  margin-top: 10px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.success {
+  color: green;
+  margin-top: 10px;
+  font-size: 14px;
+  text-align: center;
+}
+
+
