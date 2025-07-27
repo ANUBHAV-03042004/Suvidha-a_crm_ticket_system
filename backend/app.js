@@ -50,14 +50,14 @@ app.use(session({
   store: MongoStore.create({
     mongoUrl: process.env.MONGO_URI,
     collectionName: 'sessions',
-    ttl: 15 * 60, // 15 minutes in seconds
+    ttl: 50 * 60, // 50 minutes in seconds
     autoRemove: 'interval', // Use interval-based cleanup
-    autoRemoveInterval: 1, // Check every 1 minute
+    autoRemoveInterval: 5, // Check every 5 minute
   }),
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 15 * 60 * 1000, // 15 minutes in milliseconds (sync with ttl)
+    maxAge: 50 * 60 * 1000, // 15 minutes in milliseconds (sync with ttl)
     sameSite: 'strict',
   },
 }));
