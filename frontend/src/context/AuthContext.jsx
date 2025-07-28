@@ -18,8 +18,11 @@ export const AuthProvider = ({ children }) => {
           withCredentials: true,
         });
         setIsAuthenticated(true);
-        setUser(response.data.user);
-        setIsAdminAuthenticated(response.data.user.isAdmin || false);
+        // setUser(response.data.user);
+        // setIsAdminAuthenticated(response.data.user.isAdmin || false);
+        setUser(response.data?.user || null);
+setIsAdminAuthenticated(response.data?.user?.isAdmin || false);
+
       } catch (err) {
         console.error('Auth check error:', err);
         setIsAuthenticated(false);
