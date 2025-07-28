@@ -11,7 +11,8 @@ export const Forgot_Password = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('http://localhost:4000/api/auth/forgot', {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.post(`${API_URL}/api/auth/forgot`, {
         email,
       }, {
         headers: { 'Content-Type': 'application/json' },
@@ -30,7 +31,8 @@ export const Forgot_Password = () => {
 
   const handleResend = async () => {
     try {
-      const response = await axios.post('http://localhost:4000/api/auth/forgot', {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.post(`${API_URL}/api/auth/forgot`, {
         email,
       }, {
         headers: { 'Content-Type': 'application/json' },

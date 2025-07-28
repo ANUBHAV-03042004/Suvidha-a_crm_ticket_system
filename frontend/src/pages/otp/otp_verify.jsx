@@ -66,8 +66,9 @@ export const Otp_Verify = () => {
     if (!isResendDisabled) {
       try {
         console.log('Resending OTP for:', { originalEmail, pendingEmail: email }); // Debug
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
         const response = await axios.post(
-          'http://localhost:4000/api/auth/resend-otp',
+          `${API_URL}/api/auth/resend-otp`,
           { email: originalEmail, pendingEmail: email },
           { withCredentials: true }
         );
@@ -93,8 +94,9 @@ export const Otp_Verify = () => {
     }
     try {
       console.log('Submitting OTP:', { originalEmail, pendingEmail: email, otp: otpValue }); // Debug
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.post(
-        'http://localhost:4000/api/auth/verify-otp',
+        `${API_URL}/api/auth/verify-otp`,
         { email, originalEmail, otp: otpValue },
         { withCredentials: true }
       );

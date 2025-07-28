@@ -40,7 +40,8 @@ export const AdminProfile = () => {
       try {
         setLoading(true);
         console.log('Fetching admin profile with user:', user);
-        const response = await axios.get("http://localhost:4000/api/admin/me", {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await axios.get(`${API_URL}/api/admin/me`, {
           withCredentials: true,
         });
         console.log('Admin fetched:', response.data);
@@ -78,8 +79,9 @@ export const AdminProfile = () => {
         ? { username: name.trim(), pendingEmail: email }
         : { username: name.trim(), email };
       console.log('Sending update payload:', payload);
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.put(
-        "http://localhost:4000/api/admin/me",
+        `${API_URL}/api/admin/me`,
         payload,
         { withCredentials: true }
       );
@@ -110,8 +112,9 @@ export const AdminProfile = () => {
     }
     try {
       setLoading(true);
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.put(
-        "http://localhost:4000/api/admin/password",
+        `${API_URL}/api/admin/password`,
         { currentPassword, newPassword, confirmPassword },
         { withCredentials: true }
       );
@@ -132,7 +135,8 @@ export const AdminProfile = () => {
     setSuccessMessage(null);
     try {
       setLoading(true);
-      const response = await axios.delete("http://localhost:4000/api/admin/me", {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.delete(`${API_URL}/api/admin/me`, {
         withCredentials: true,
       });
       setSuccessMessage("Miss you! Your account has been deleted.");

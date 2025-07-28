@@ -29,8 +29,9 @@ export const AdminLogin = () => {
 
     try {
       console.log('Sending login request with:', { email, password }); // Debug log
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.post(
-        'http://localhost:4000/api/auth/login/admin',
+        `${API_URL}/api/auth/login/admin`,
         { email, password },
         { withCredentials: true } // Ensure session cookies are sent
       );

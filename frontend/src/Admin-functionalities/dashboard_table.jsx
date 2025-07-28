@@ -16,7 +16,8 @@ export const Dashboard_Table = ({ clients, fetchClients }) => {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:4000/api/clients/${selectedClient._id}`, {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      await axios.delete(`${API_URL}/api/clients/${selectedClient._id}`, {
         withCredentials: true,
       });
       console.log('Client deleted:', selectedClient);
@@ -36,7 +37,8 @@ export const Dashboard_Table = ({ clients, fetchClients }) => {
 
   const openImageModal = (imageUrl) => {
     if (imageUrl) {
-      setSelectedImage(`http://localhost:4000${imageUrl}`);
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      setSelectedImage(`${API_URL}${imageUrl}`);
       setShowImageModal(true);
     } else {
       alert('No order invoice available for this client.');

@@ -71,7 +71,8 @@ export const Add_new_client = () => {
       }
 
       console.log('Submitting client:', Object.fromEntries(data));
-      const response = await axios.post('http://localhost:4000/api/clients', data, {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.post(`${API_URL}/api/clients`, data, {
         withCredentials: true,
         headers: { 'Content-Type': 'multipart/form-data' },
       });

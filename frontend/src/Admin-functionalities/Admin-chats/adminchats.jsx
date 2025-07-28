@@ -16,7 +16,8 @@ export const AdminChats = () => {
   // Fetch all tickets
   const fetchTickets = async () => {
     try {
-      const response = await axios.get('http://localhost:4000/api/tickets', {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.get(`${API_URL}/api/tickets`, {
         withCredentials: true,
       });
       console.log('Fetched tickets:', response.data);
@@ -37,8 +38,9 @@ export const AdminChats = () => {
   const toggleStatus = async (ticketId, currentStatus) => {
     const newStatus = currentStatus === 'resolved' ? 'pending' : 'resolved';
     try {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.put(
-        `http://localhost:4000/api/tickets/${ticketId}`,
+        `${API_URL}/api/tickets/${ticketId}`,
         { status: newStatus },
         { withCredentials: true }
       );
@@ -55,7 +57,8 @@ export const AdminChats = () => {
   const clearChat = async (ticketId) => {
     if (window.confirm(`Are you sure you want to clear the chat for ticket ${ticketId}?`)) {
       try {
-        const response = await axios.delete(`http://localhost:4000/api/tickets/${ticketId}`, {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await axios.delete(`${API_URL}/api/tickets/${ticketId}`, {
           withCredentials: true,
         });
         console.log('Cleared chat:', response.data);
@@ -71,7 +74,8 @@ export const AdminChats = () => {
   // Open image modal
   const openImageModal = (imageUrl, type) => {
     if (imageUrl) {
-      setSelectedImage(`http://localhost:4000${imageUrl}`);
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      setSelectedImage(`${API_URL}${imageUrl}`);
       setImageType(type);
       setShowImageModal(true);
     } else {

@@ -17,7 +17,10 @@ export const AdminDashboard = () => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.get('http://localhost:4000/api/clients', {
+      // const response = await axios.get('${API_URL}/api/clients', {
+      const API_URL = import.meta.env.API_BASE_URL;
+const response = await axios.get(`${API_URL}/api/clients`,{
+
         withCredentials: true,
       });
       console.log('Fetched clients:', response.data);

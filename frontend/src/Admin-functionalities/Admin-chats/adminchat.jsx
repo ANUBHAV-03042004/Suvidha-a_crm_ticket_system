@@ -26,7 +26,8 @@ export const AdminChat = () => {
   // Fetch ticket details
   const fetchTicket = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/tickets');
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_URL}/api/tickets`);
       if (!response.ok) {
         throw new Error(`Failed to fetch tickets: ${response.status}`);
       }
@@ -50,7 +51,8 @@ export const AdminChat = () => {
   const fetchMessages = useCallback(async (retryCount = 0, maxRetries = 3) => {
     if (!ticketId) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/tickets/messages/${ticketId}`);
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_URL}/api/tickets/messages/${ticketId}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch messages: ${response.status} ${response.statusText}`);
       }
@@ -84,7 +86,8 @@ export const AdminChat = () => {
   const sendReply = async () => {
     if (!input.trim()) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/tickets/send/${ticketId}`, {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_URL}/api/tickets/send/${ticketId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: input, isAdmin: true }),
@@ -113,7 +116,8 @@ export const AdminChat = () => {
   const clearChat = async () => {
     if (window.confirm(`Are you sure you want to clear the chat for ticket ${ticketId}?`)) {
       try {
-        const response = await fetch(`http://localhost:4000/api/tickets/delete/${ticketId}`, {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_URL}/api/tickets/delete/${ticketId}`, {
           method: 'DELETE',
         });
         if (!response.ok) {

@@ -25,7 +25,8 @@ export const EditClient = () => {
   useEffect(() => {
     const fetchClient = async () => {
       try {
-        const response = await axios.get(`http://localhost:4000/api/clients/${id}`, {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await axios.get(`${API_URL}/api/clients/${id}`, {
           withCredentials: true,
         });
         console.log('Fetched client:', response.data);
@@ -100,7 +101,8 @@ export const EditClient = () => {
       }
 
       console.log('Updating client:', Object.fromEntries(data));
-      const response = await axios.put(`http://localhost:4000/api/clients/${id}`, data, {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.put(`${API_URL}/api/clients/${id}`, data, {
         withCredentials: true,
         headers: { 'Content-Type': 'multipart/form-data' },
       });

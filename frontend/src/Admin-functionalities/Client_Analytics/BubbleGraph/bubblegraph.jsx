@@ -10,7 +10,8 @@ export const Bubblegraph = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/clients', {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await axios.get(`${API_URL}/api/clients`, {
           withCredentials: true,
         });
         console.log('Fetched clients for bubble graph:', response.data);

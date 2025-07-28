@@ -4,8 +4,6 @@ import express from 'express';
 const router = express.Router();
 // const passport = require('passport');
 import passport from 'passport';
-// const bcrypt = require('bcrypt');
-import bcrypt from 'bcrypt';
 // const nodemailer = require('nodemailer');
 import nodemailer from 'nodemailer';
 // const crypto = require('crypto');
@@ -139,7 +137,7 @@ router.post('/logout', (req, res) => {
         console.error('Session destroy error:', err);
         return res.status(500).json({ error: 'Failed to destroy session' });
       }
-      res.clearCookie('connect.sid', { path: '/', httpOnly: true, sameSite: 'strict' });
+      res.clearCookie('connect.sid', { path: '/', httpOnly: true,  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', });
       res.status(200).json({ message: 'Logout successful' });
     });
   });

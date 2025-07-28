@@ -14,7 +14,8 @@ export const Piechart = () => {
   useEffect(() => {
     const fetchTickets = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/tickets', {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await axios.get(`${API_URL}/api/tickets`, {
           withCredentials: true,
         });
         console.log('Fetched tickets:', response.data);

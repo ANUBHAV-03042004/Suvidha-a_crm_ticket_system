@@ -25,13 +25,15 @@ export const Edit_New_Ticket = () => {
     const checkSessionAndFetchTicket = async () => {
       try {
         console.log('Checking session for ticketId:', ticketId);
-        const sessionResponse = await axios.get('http://localhost:4000/api/auth/check', {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        const sessionResponse = await axios.get(`${API_URL}/api/auth/check`, {
           withCredentials: true,
         });
         console.log('Session check response:', sessionResponse.data);
 
         setLoading(true);
-        const ticketResponse = await axios.get(`http://localhost:4000/api/tickets/${ticketId}`, {
+        
+        const ticketResponse = await axios.get(`${API_URL}/api/tickets/${ticketId}`, {
           withCredentials: true,
         });
         console.log('Fetched ticket:', ticketResponse.data);
@@ -103,8 +105,8 @@ export const Edit_New_Ticket = () => {
       if (ticket.product_image && ticket.product_image instanceof File) {
         formData.append('product_image', ticket.product_image);
       }
-
-      const response = await axios.put(`http://localhost:4000/api/tickets/${ticketId}`, formData, {
+const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.put(`${API_URL}/api/tickets/${ticketId}`, formData, {
         withCredentials: true,
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -231,7 +233,8 @@ export const Edit_New_Ticket = () => {
             </span>
             <h3>Invoice Image</h3>
             <img
-              src={`http://localhost:4000${ticket.invoice}`}
+            
+              src={`${API_URL}${ticket.invoice}`}
               alt="Invoice"
               className="modal-image"
               onError={(e) => console.error('Error loading invoice image:', e)}
@@ -249,7 +252,7 @@ export const Edit_New_Ticket = () => {
             </span>
             <h3>Product Image</h3>
             <img
-              src={`http://localhost:4000${ticket.product_image}`}
+              src={`${API_URL}${ticket.product_image}`}
               alt="Product"
               className="modal-image"
               onError={(e) => console.error('Error loading product image:', e)}

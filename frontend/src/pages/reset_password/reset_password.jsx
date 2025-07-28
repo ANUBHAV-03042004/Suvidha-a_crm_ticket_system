@@ -20,7 +20,8 @@ export const Reset_Password = () => {
       return;
     }
     try {
-      const response = await axios.post(`http://localhost:4000/api/auth/reset/${id}/${token}`, {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.post(`${API_URL}/api/auth/reset/${id}/${token}`, {
         password
       }, {
         headers: { 'Content-Type': 'application/json' },

@@ -39,7 +39,8 @@ export const Profile = () => {
     const fetchUser = async () => {
       try {
         console.log('Fetching user with AuthContext:', { user }); // Debug
-        const response = await axios.get('http://localhost:4000/api/users/me', {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await axios.get(`${API_URL}/api/users/me`, {
           withCredentials: true,
         });
         console.log('User fetched:', response.data); // Debug
@@ -87,7 +88,8 @@ export const Profile = () => {
         updateData.email = email;
       }
       console.log('Sending update data:', updateData); // Debug
-      await axios.put('http://localhost:4000/api/users/me', updateData, {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      await axios.put(`${API_URL}/api/users/me`, updateData, {
         withCredentials: true,
       });
 
@@ -117,8 +119,9 @@ export const Profile = () => {
     }
 
     try {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.put(
-        'http://localhost:4000/api/users/password',
+        `${API_URL}/api/users/password`,
         { currentPassword, newPassword },
         { withCredentials: true }
       );
@@ -139,7 +142,8 @@ export const Profile = () => {
     setSuccessMessage(null);
 
     try {
-      await axios.delete('http://localhost:4000/api/users/me', {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      await axios.delete(`${API_URL}/api/users/me`, {
         withCredentials: true,
       });
       setShowDeleteModal(false);

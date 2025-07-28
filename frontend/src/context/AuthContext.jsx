@@ -13,7 +13,8 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/auth/check', {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await axios.get(`${API_URL}/api/auth/check`, {
           withCredentials: true,
         });
         setIsAuthenticated(true);
@@ -33,8 +34,9 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password, isAdmin = false) => {
     try {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.post(
-        `http://localhost:4000/api/auth/login${isAdmin ? '/admin' : ''}`,
+        `${API_URL}/api/auth/login${isAdmin ? '/admin' : ''}`,
         { email, password },
         { withCredentials: true }
       );
@@ -49,7 +51,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('http://localhost:4000/api/auth/logout', {}, { withCredentials: true });
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      await axios.post(`${API_URL}/api/auth/logout`, {}, { withCredentials: true });
       setIsAuthenticated(false);
       setIsAdminAuthenticated(false);
       setUser(null);

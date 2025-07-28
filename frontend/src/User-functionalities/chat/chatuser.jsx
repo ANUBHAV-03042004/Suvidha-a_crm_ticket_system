@@ -29,7 +29,8 @@ export const Chatuser = () => {
   // Fetch ticket details
   const fetchTicket = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/tickets', {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_URL}/api/tickets`, {
         credentials: 'include',
       });
       if (!response.ok) {
@@ -55,7 +56,8 @@ export const Chatuser = () => {
   const fetchMessages = useCallback(async () => {
     if (!ticketId) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/tickets/messages/${ticketId}`, {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_URL}/api/tickets/messages/${ticketId}`, {
         credentials: 'include',
       });
       if (!response.ok) {
@@ -97,7 +99,8 @@ export const Chatuser = () => {
   const sendMessage = async () => {
     if (!input.trim()) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/tickets/send/${ticketId}`, {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_URL}/api/tickets/send/${ticketId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -126,7 +129,8 @@ export const Chatuser = () => {
   const clearChat = async () => {
     if (window.confirm('Are you sure you want to clear this chat?')) {
       try {
-        const response = await fetch(`http://localhost:4000/api/tickets/delete/${ticketId}`, {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_URL}/api/tickets/delete/${ticketId}`, {
           method: 'DELETE',
           credentials: 'include',
         });

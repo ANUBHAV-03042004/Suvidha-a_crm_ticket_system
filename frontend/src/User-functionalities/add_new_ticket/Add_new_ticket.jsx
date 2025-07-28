@@ -22,7 +22,8 @@ export const Add_new_ticket = () => {
   useEffect(() => {
     const checkSession = async () => {
       try {
-        const response = await fetch('http://localhost:4000/api/auth/check', {
+        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        const response = await fetch(`${API_URL}/api/auth/check`, {
           credentials: 'include',
         });
         if (!response.ok) {
@@ -83,8 +84,8 @@ export const Add_new_ticket = () => {
       formData.append('description', newTicket.description);
       if (newTicket.invoice) formData.append('invoice', newTicket.invoice);
       if (newTicket.product_image) formData.append('product_image', newTicket.product_image);
-
-      const response = await fetch('http://localhost:4000/api/tickets', {
+const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await fetch(`${API_URL}/api/tickets`, {
         method: 'POST',
         body: formData,
         credentials: 'include',

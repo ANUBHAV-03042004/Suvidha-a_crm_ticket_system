@@ -16,7 +16,8 @@ export const Register = () => {
   const handleSubmit = async (e) => {
     e.preventDefault(); // Prevent default behavior (though not needed for button click)
     try {
-      const response = await axios.post('http://localhost:4000/api/auth/register', {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const response = await axios.post(`${API_URL}/api/auth/register`, {
         username: username.trim(),
         email: email.trim(),
         password: password.trim(),

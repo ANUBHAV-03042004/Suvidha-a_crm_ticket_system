@@ -23,7 +23,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // CORS setup
 app.use(cors({
-  origin: 'http://localhost:5173',
+  // origin: 'http://localhost:5173',
+  origin: process.env.CLIENT_URL,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -58,7 +59,7 @@ app.use(session({
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     maxAge: 50 * 60 * 1000, // 15 minutes in milliseconds (sync with ttl)
-    sameSite: 'strict',
+   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   },
 }));
 
@@ -80,7 +81,7 @@ app.use((req, res, next) => {
           console.error('Error destroying session:', err);
           return res.status(500).json({ error: 'Failed to destroy session' });
         }
-        res.clearCookie('connect.sid', { path: '/', httpOnly: true, sameSite: 'strict' });
+        res.clearCookie('connect.sid', { path: '/', httpOnly: true,  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', });
         console.log(`Session destroyed: ${req.sessionID}`);
         res.status(401).json({ error: 'Session expired, please log in' });
       });
@@ -132,14 +133,14 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/admin',AdminRoutes);
 // Clear sessions on startup (for testing)
-mongoose.connect(process.env.MONGO_URI)
-  .then(async () => {
-    console.log('MongoDB connected');
-    const db = mongoose.connection.db;
-    await db.collection('sessions').deleteMany({});
-    console.log('Cleared all sessions on startup');
-  })
-  .catch((err) => console.error('MongoDB connection error:', err));
+// mongoose.connect(process.env.MONGO_URI)
+//   .then(async () => {
+//     console.log('MongoDB connected');
+//     const db = mongoose.connection.db;
+//     await db.collection('sessions').deleteMany({});
+//     console.log('Cleared all sessions on startup');
+//   })
+//   .catch((err) => console.error('MongoDB connection error:', err));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -150,5 +151,5 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

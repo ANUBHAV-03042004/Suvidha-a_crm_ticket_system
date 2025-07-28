@@ -26,7 +26,8 @@ export const Feedback = () => {
       const fetchUser = async () => {
         try {
           console.log('Fetching user data for Feedback'); // Debug
-          const response = await axios.get('http://localhost:4000/api/users/me', {
+          const API_URL = import.meta.env.VITE_API_BASE_URL;
+          const response = await axios.get(`${API_URL}/api/users/me`, {
             withCredentials: true,
           });
           console.log('Fetched user:', response.data); // Debug
@@ -53,8 +54,9 @@ export const Feedback = () => {
 
     try {
       console.log('Submitting feedback:', { username, email, rating, comments });
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.post(
-        'http://localhost:4000/api/feedback/submit',
+        `${API_URL}/api/feedback/submit`,
         { username, email, rating: Number(rating), comments },
         { withCredentials: true }
       );

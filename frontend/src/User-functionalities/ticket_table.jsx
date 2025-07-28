@@ -21,13 +21,14 @@ export const Ticket_table = () => {
     setLoading(true);
     setError(null);
     try {
-      const sessionResponse = await axios.get('http://localhost:4000/api/auth/check', {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const sessionResponse = await axios.get(`${API_URL}/api/auth/check`, {
         withCredentials: true,
         timeout: 5000,
       });
       console.log('Session check response:', sessionResponse.data);
 
-      const response = await axios.get('http://localhost:4000/api/tickets', {
+      const response = await axios.get(`${API_URL}/api/tickets`, {
         withCredentials: true,
         timeout: 5000,
       });
@@ -78,7 +79,8 @@ export const Ticket_table = () => {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:4000/api/tickets/${selectedIssue._id}`, {
+      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      await axios.delete(`${API_URL}/api/tickets/${selectedIssue._id}`, {
         withCredentials: true,
       });
       const updatedTickets = tickets.filter((ticket) => ticket._id !== selectedIssue._id);
@@ -261,7 +263,7 @@ export const Ticket_table = () => {
               </span>
               <h3>Invoice Image</h3>
               <img
-                src={`http://localhost:4000${selectedInvoice}`}
+                src={`${API_URL}${selectedInvoice}`}
                 alt="Invoice"
                 className="modal-image"
                 onError={(e) => console.error('Error loading invoice image:', e)}
@@ -277,7 +279,7 @@ export const Ticket_table = () => {
               </span>
               <h3>Product Image</h3>
               <img
-                src={`http://localhost:4000${selectedProductImage}`}
+                src={`${API_URL}${selectedProductImage}`}
                 alt="Product"
                 className="modal-image"
                 onError={(e) => console.error('Error loading product image:', e)}
