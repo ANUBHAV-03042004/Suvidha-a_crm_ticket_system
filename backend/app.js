@@ -23,8 +23,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // CORS setup
 app.use(cors({
-  // origin: 'http://localhost:5173',
-  origin: process.env.CLIENT_URL,
+  origin: ['http://localhost:5173',  process.env.CLIENT_URL],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -45,7 +44,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Session setup with MongoDB store
 app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
