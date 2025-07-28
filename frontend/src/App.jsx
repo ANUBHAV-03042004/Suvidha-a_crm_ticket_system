@@ -17,7 +17,7 @@ import {AdminDashboard} from './Admin-functionalities/Admin_dashboard';
 import {AdminProfile} from './Admin-functionalities/Admin-profile/Admin_Profile';
 import {Add_new_client} from './Admin-functionalities/add_new_client/Add_new_client';
 import { Client_Analytics } from './Admin-functionalities/Client_Analytics/client_analytics';
-import { Chatuser } from './User-functionalities/chat/chatUser';
+import { Chatuser } from './User-functionalities/chat/chatuser';
 import { AdminChats } from './Admin-functionalities/Admin-chats/adminchats';
 import { AdminChat } from './Admin-functionalities/Admin-chats/adminchat';
 import { ProtectedRoute } from './ProtectedRoute/ProtectedRoute';
