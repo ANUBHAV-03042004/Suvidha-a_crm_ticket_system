@@ -81,7 +81,7 @@ app.use((req, res, next) => {
           console.error('Error destroying session:', err);
           return res.status(500).json({ error: 'Failed to destroy session' });
         }
-        res.clearCookie('connect.sid', { path: '/', httpOnly: true,  sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', });
+        res.clearCookie('connect.sid', { path: '/', httpOnly: true, sameSite: 'strict' });
         console.log(`Session destroyed: ${req.sessionID}`);
         res.status(401).json({ error: 'Session expired, please log in' });
       });
@@ -133,14 +133,14 @@ app.use('/api/feedback', feedbackRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/admin',AdminRoutes);
 // Clear sessions on startup (for testing)
-// mongoose.connect(process.env.MONGO_URI)
-//   .then(async () => {
-//     console.log('MongoDB connected');
-//     const db = mongoose.connection.db;
-//     await db.collection('sessions').deleteMany({});
-//     console.log('Cleared all sessions on startup');
-//   })
-//   .catch((err) => console.error('MongoDB connection error:', err));
+mongoose.connect(process.env.MONGO_URI)
+  .then(async () => {
+    console.log('MongoDB connected');
+    const db = mongoose.connection.db;
+    await db.collection('sessions').deleteMany({});
+    console.log('Cleared all sessions on startup');
+  })
+  .catch((err) => console.error('MongoDB connection error:', err));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
