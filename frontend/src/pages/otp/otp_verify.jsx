@@ -2,30 +2,46 @@ import { useState, useRef, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
+import { Loader } from '../../home/Loader';
+import { useAuth } from '../../context/AuthContext';
 
 export const Otp_Verify = () => {
   const inputRefs = useRef([]);
-  const [otp, setOtp] = useState(['', '', '', '', '', '']); // 6 digits
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(30);
   const [isResendDisabled, setIsResendDisabled] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { state } = useLocation();
   const navigate = useNavigate();
-  const email = state?.email || ''; // pendingEmail
-  const originalEmail = state?.originalEmail || ''; // original email
-  const isProfileUpdate = state?.isProfileUpdate || false;
+  const { setAuthAfterLogin } = useAuth();
+  const email = state?.email || '';
+  const isAdmin = state?.isAdmin || false;
+ const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+  console.log('Otp_Verify state:', { email, isAdmin }); // Debug state
 
   useEffect(() => {
+    if (!email) {
+      console.log('No email provided, redirecting to:', isAdmin ? '/login/admin' : '/login');
+      navigate(isAdmin ? '/login/admin' : '/login', { replace: true });
+    }
+    let interval;
     if (isResendDisabled && timer > 0) {
-      const interval = setInterval(() => {
-        setTimer((prev) => prev - 1);
+      interval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev <= 1) {
+            setIsResendDisabled(false);
+            return 0;
+          }
+          return prev - 1;
+        });
       }, 1000);
-      return () => clearInterval(interval);
     } else if (timer === 0) {
       setIsResendDisabled(false);
     }
-  }, [timer, isResendDisabled]);
+    return () => clearInterval(interval);
+  }, [timer, isResendDisabled, email, navigate, isAdmin]);
 
   const handleChange = (e, index) => {
     const value = e.target.value.replace(/[^0-9]/g, '');
@@ -64,22 +80,24 @@ export const Otp_Verify = () => {
   const handleResend = async (e) => {
     e.preventDefault();
     if (!isResendDisabled) {
+      setIsLoading(true);
+      setError('');
+      setSuccess('');
+      console.log('Resending OTP for:', { email, isAdmin });
       try {
-        console.log('Resending OTP for:', { originalEmail, pendingEmail: email }); // Debug
-        const API_URL = import.meta.env.VITE_API_BASE_URL;
         const response = await axios.post(
           `${API_URL}/api/auth/resend-otp`,
-          { email: originalEmail, pendingEmail: email },
+          { email },
           { withCredentials: true }
         );
         setSuccess(response.data.message);
-        setError('');
         setTimer(30);
         setIsResendDisabled(true);
       } catch (err) {
-        console.error('Resend OTP error:', err);
+        console.error('Resend OTP error:', err.response?.data || err.message);
         setError(err.response?.data?.error || 'Failed to resend OTP');
-        setSuccess('');
+      } finally {
+        setIsLoading(false);
       }
     }
   };
@@ -92,34 +110,36 @@ export const Otp_Verify = () => {
       setSuccess('');
       return;
     }
+    setIsLoading(true);
+    setError('');
+    setSuccess('');
+    console.log('Submitting OTP:', { email, otp: otpValue, isAdmin });
     try {
-      console.log('Submitting OTP:', { originalEmail, pendingEmail: email, otp: otpValue }); // Debug
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.post(
         `${API_URL}/api/auth/verify-otp`,
-        { email, originalEmail, otp: otpValue },
+        { email, otp: otpValue },
         { withCredentials: true }
       );
       setSuccess(response.data.message);
-      setError('');
-      const redirectPath = response.data.isAdmin ? '/login/admin' : '/login';
-      console.log('Redirecting to:', redirectPath); // Debug
-      setTimeout(
-        () =>
-          navigate(redirectPath, {
-            state: { message: 'Email verified successfully!' },
-          }),
-        1000
-      );
+      const userData = { 
+        email, 
+        username: response.data.username || email, 
+        isAdmin: response.data.isAdmin || isAdmin // Use backend isAdmin if available
+      };
+      console.log('Calling setAuthAfterLogin:', { redirect: isAdmin ? '/login/admin' : '/login', userData, isAdmin });
+      await setAuthAfterLogin(isAdmin ? '/login/admin' : '/login', userData, isAdmin);
+      console.log('Navigating to:', isAdmin ? '/login/admin' : '/login');
+      navigate(isAdmin ? '/login/admin' : '/login', { replace: true });
     } catch (err) {
-      console.error('OTP verification error:', err.response?.data || err);
+      console.error('OTP verification error:', err.response?.data || err.message);
       setError(err.response?.data?.error || 'OTP verification failed');
-      setSuccess('');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <StyledWrapper>
+    <StyledWrapper $isAdmin={isAdmin}>
       <div className="container">
         <form className="form" onSubmit={handleSubmit}>
           <div className="info">
@@ -142,8 +162,8 @@ export const Otp_Verify = () => {
             ))}
             <input type="hidden" name="otp" value={otp.join('')} />
           </div>
-          <button className="validate" type="submit">
-            Verify
+          <button className="validate" type="submit" disabled={isLoading}>
+            {isLoading ? 'Verifying...' : 'Verify'}
           </button>
           {error && <p className="error">{error}</p>}
           {success && <p className="success">{success}</p>}
@@ -158,19 +178,32 @@ export const Otp_Verify = () => {
             )}
           </p>
         </form>
+        {isLoading && (
+          <LoaderOverlay>
+            <LoaderWrapper>
+              <Loader />
+            </LoaderWrapper>
+          </LoaderOverlay>
+        )}
       </div>
     </StyledWrapper>
   );
 };
 
-// Styled-components remain unchanged
 const StyledWrapper = styled.div`
   width: 100%;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: #679ef8;
+
+  .container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: ${({ $isAdmin }) => ($isAdmin ? '#b782d8 !important' : '#679ef8 !important')};
+  }
 
   @media (max-width: 400px) {
     height: 150vh;
@@ -179,13 +212,6 @@ const StyledWrapper = styled.div`
   @media (min-width: 0px) and (max-width: 270px) {
     height: 400vh;
     width: 400vw;
-  }
-
-  .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
   }
 
   .form {
@@ -275,7 +301,7 @@ const StyledWrapper = styled.div`
     font-size: 13px;
     font-weight: 600;
     border-radius: 10px;
-    transition: .3s ease;
+    transition: 0.3s ease;
     color: white;
     width: 100%;
     cursor: pointer;
@@ -286,15 +312,72 @@ const StyledWrapper = styled.div`
     color: white;
   }
 
+  .validate:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
   .error {
-    color: red;
+    color: #b00020;
+    background-color: #ffdede;
     margin-top: 10px;
     font-size: 14px;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    text-align: center;
   }
 
   .success {
-    color: green;
+    color: #2e7d32;
+    background-color: #dcf8c6;
     margin-top: 10px;
     font-size: 14px;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    text-align: center;
   }
 `;
+
+const LoaderOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+`;
+
+const LoaderWrapper = styled.div`
+  .earth p {
+    color: white !important;
+  }
+`;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

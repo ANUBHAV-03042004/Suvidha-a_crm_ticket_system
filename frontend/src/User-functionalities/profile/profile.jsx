@@ -7,7 +7,7 @@ import './profile.css';
 import user_image from '../../assets/img/user_details.png';
 import user_delete from '../../assets/img/user_delete.png';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import { AuthContext } from '../../context/Authcontext';
+import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { Loader } from '../../home/Loader';
 

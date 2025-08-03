@@ -43,7 +43,7 @@ const upload = multer({
 router.post('/', ensureAuthenticated, upload.single('order_invoice'), async (req, res) => {
   try {
     const { name, address, mobileNumber, company, totalOrder, orderId } = req.body;
-    console.log('Adding client:', { name, address, mobileNumber, company, totalOrder, orderId, order_invoice: req.file?.filename });
+    console.log('Adding client:', { name, address, mobileNumber, company, totalOrder, orderId, order_invoice: req.file?.filename, user: req.user?._id });
 
     // Validate input
     if (!name || !address || !mobileNumber || !company || totalOrder === undefined || !orderId) {
@@ -88,9 +88,9 @@ router.post('/', ensureAuthenticated, upload.single('order_invoice'), async (req
 // Get all clients (Admin only)
 router.get('/', ensureAuthenticated, async (req, res) => {
   try {
-    console.log('Fetching clients for user:', req.user._id.toString());
+    console.log('Fetching clients for user:', req.user?._id?.toString(), 'sessionID:', req.sessionID);
     const clients = await Client.find({ createdBy: req.user._id }).sort({ updatedAt: -1 });
-    console.log('Clients found:', clients.length);
+    console.log('Clients found:', clients.length, 'data:', clients);
     res.json(clients);
   } catch (err) {
     console.error('Error fetching clients:', err);

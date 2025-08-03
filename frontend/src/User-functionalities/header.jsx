@@ -1,7 +1,7 @@
 import { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../assets/img/logo.png';
-import { AuthContext } from '../context/Authcontext';
+import { AuthContext } from '../context/AuthContext';
 import { Loader } from '../home/Loader';
 import './ticket_table.css';
 
@@ -23,7 +23,7 @@ export const Header_user_dashboard = () => {
     try {
       await logout();
       setShowLogoutModal(false);
-      window.location.href = '/login'; // Direct redirect after logout
+      window.location.href = '/login';
     } catch (error) {
       console.error('Logout failed:', error);
       setShowLogoutModal(false);

@@ -134,7 +134,7 @@ export const AdminChat = () => {
   };
 
   if (loading) {
-    // return <div>Loading...</div>;
+
     return <Loader/>;
   }
 

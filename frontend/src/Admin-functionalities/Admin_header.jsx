@@ -1,29 +1,39 @@
-import { useState,useContext } from 'react';
+import { useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import './Admin_dashboard.css';
 import '../User-functionalities/logout.css';
 import logo from '../assets/img/logo.png';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import { AuthContext } from '../context/Authcontext';
+import { AuthContext } from '../context/AuthContext';
+
 export const AdminHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
- const authContext = useContext(AuthContext);
- const { logout } = authContext;
+  const authContext = useContext(AuthContext);
+
+  // Safeguard against undefined context
+  if (!authContext) {
+    console.error('AuthContext is not provided');
+    return <div>Error: Authentication context not available</div>;
+  }
+
+  const { logout } = authContext;
+
   const handleToggle = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleLogout = async() => {
+  const handleLogout = async () => {
     try {
       await logout();
       setShowLogoutModal(false);
-      navigate('/');
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error('Logout failed:', error.response?.data || error.message);
       setShowLogoutModal(false);
-      alert('Failed to logout. Please try again.');
+      authContext.setIsAuthenticated(false);
+      authContext.setUser(null);
+      alert('Logout failed on server, but client state cleared. Please try again if issues persist.');
     }
   };
 

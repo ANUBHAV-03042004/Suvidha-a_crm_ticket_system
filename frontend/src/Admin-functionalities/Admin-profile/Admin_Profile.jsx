@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AdminHeader } from "../Admin_header.jsx";
@@ -7,9 +7,9 @@ import { Show_Hide } from "../show_hide.jsx";
 import user_image from "../../assets/img/user_details.png";
 import user_delete from "../../assets/img/user_delete.png";
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
-import { AuthContext } from "../../context/Authcontext";
+import { AuthContext } from "../../context/AuthContext.jsx";
 import './Admin-Profile.css';
-import {Loader} from '../../home/Loader.jsx';
+import { Loader } from '../../home/Loader.jsx';
 
 export const AdminProfile = () => {
   const { user, logout, loading: authLoading } = useContext(AuthContext);
@@ -91,7 +91,7 @@ export const AdminProfile = () => {
       setSuccessMessage(response.data.message);
       if (response.data.emailChanged) {
         navigate("/otp-verify", {
-          state: { email, originalEmail, isProfileUpdate: true },
+          state: { email, originalEmail, isProfileUpdate: true, isAdmin: true },
         });
       }
     } catch (err) {
@@ -153,8 +153,7 @@ export const AdminProfile = () => {
   };
 
   if (authLoading || loading) {
-    // return <div>Loading...</div>; 
-    return <Loader/>;
+    return <Loader />;
   }
 
   return (

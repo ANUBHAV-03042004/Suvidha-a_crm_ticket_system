@@ -24,22 +24,12 @@ export const Homepage = () => {
             else
                 alert("not good error handling");
         } catch (error) {
-            // Log errors only in development
-            // if (process.env.NODE_ENV === "development") {
-            //     console.log("Error during access check:", error);
-            // }
 
             setShow(true); // Show error to the user
 
-            // Optionally, show a user-friendly message to the user
             alert("An error occurred. Please try again.",error);
         }
     };
-
-
-    // useEffect(() => {
-    //     access().then(r => console.log(r));
-    // }, []);
 
     return (
         <>

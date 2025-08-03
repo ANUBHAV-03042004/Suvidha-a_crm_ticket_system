@@ -23,7 +23,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // CORS setup
 app.use(cors({
-  origin: ['http://localhost:5173',  process.env.CLIENT_URL],
+  origin: 'http://localhost:5173',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -44,7 +44,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Session setup with MongoDB store
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
@@ -58,7 +58,7 @@ app.use(session({
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     maxAge: 50 * 60 * 1000, // 15 minutes in milliseconds (sync with ttl)
-   sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+    sameSite: 'strict',
   },
 }));
 
@@ -150,5 +150,5 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

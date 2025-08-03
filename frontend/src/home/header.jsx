@@ -1,15 +1,14 @@
 import React, { useContext, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import './homepage.css';
 import logo from '../assets/img/logo.png';
-import { AuthContext } from '../context/Authcontext';
+import { AuthContext } from '../context/AuthContext';
 import { Loader } from './Loader';
 
 export const Header = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const authContext = useContext(AuthContext);
-  const navigate = useNavigate();
 
   // Safeguard against undefined context
   if (!authContext) {
@@ -17,7 +16,7 @@ export const Header = () => {
     return <div>Error: Authentication context not available</div>;
   }
 
-  const { isAuthenticated, isAdminAuthenticated, user, logout, loading } = authContext;
+  const { isAuthenticated, user, logout, isLoading } = authContext;
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
@@ -30,17 +29,19 @@ export const Header = () => {
 
   const confirmLogout = async () => {
     try {
-      await logout();
+      await logout(); // No need to pass isAdmin
       setShowLogoutModal(false);
-      navigate('/');
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error('Logout failed:', error.response?.data || error.message);
       setShowLogoutModal(false);
-      alert('Failed to logout. Please try again.');
+      // Fallback: Clear client-side auth state
+      authContext.setIsAuthenticated(false);
+      authContext.setUser(null);
+      alert('Logout failed on server, but client state cleared. Please try again if issues persist.');
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return <Loader />;
   }
 
@@ -66,28 +67,28 @@ export const Header = () => {
                 Home
               </Link>
             </li>
-            {isAuthenticated || isAdminAuthenticated ? (
-          <>
-            {isAdminAuthenticated ? (
-              <li className="nav-item">
-                <Link to="/admin-dashboard" id="cap" className="nav-link">
-                  Admin Dashboard
-                </Link>
-              </li>
-            ) : isAuthenticated ? (
-              <li className="nav-item">
-                <Link to="/user-dashboard" id="cap" className="nav-link">
-                  User Dashboard
-                </Link>
-              </li>
-            ) : null}
-            <li className="nav-item">
-              <Link id="cap" onClick={handleLogout} className="nav-link logout-btn">
-                Logout
-              </Link>
-            </li>
-          </>
-        ) : (
+            {isAuthenticated && user ? (
+              <>
+                {user.isAdmin ? (
+                  <li className="nav-item">
+                    <Link to="/admin-dashboard" id="cap" className="nav-link">
+                      Admin Dashboard
+                    </Link>
+                  </li>
+                ) : (
+                  <li className="nav-item">
+                    <Link to="/user-dashboard" id="cap" className="nav-link">
+                      User Dashboard
+                    </Link>
+                  </li>
+                )}
+                <li className="nav-item">
+                  <Link id="cap" onClick={handleLogout} className="nav-link logout-btn">
+                    Logout
+                  </Link>
+                </li>
+              </>
+            ) : (
               <>
                 <li className="nav-item dropdown">
                   <Link

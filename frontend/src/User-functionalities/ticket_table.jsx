@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+// src/components/ticket_table.jsx
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './ticket_table.css';
 import axios from 'axios';
+import { AuthContext } from '../context/AuthContext';
 
 export const Ticket_table = () => {
+  const { isAuthenticated, loading: authLoading } = useContext(AuthContext);
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [selectedIssue, setSelectedIssue] = useState(null);
@@ -17,44 +20,45 @@ export const Ticket_table = () => {
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [selectedProductImage, setSelectedProductImage] = useState(null);
 
-  const fetchTickets = async () => {
+  const fetchTickets = useCallback(async () => {
+    if (!isAuthenticated) {
+      setError('Please log in to view tickets');
+      navigate('/login');
+      return;
+    }
+
+    if (loading) return; // Prevent redundant fetches
+
     setLoading(true);
     setError(null);
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
-      const sessionResponse = await axios.get(`${API_URL}/api/auth/check`, {
-        withCredentials: true,
-        timeout: 5000,
-      });
-      console.log('Session check response:', sessionResponse.data);
-
+      const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
       const response = await axios.get(`${API_URL}/api/tickets`, {
         withCredentials: true,
         timeout: 5000,
       });
       console.log('Fetched tickets:', response.data);
-      setTickets(response.data);
-      setFilteredTickets(response.data);
+      const ticketsData = Array.isArray(response.data) ? response.data : [];
+      setTickets(ticketsData);
+      setFilteredTickets(ticketsData);
     } catch (error) {
-      console.error('Error fetching tickets:', error.message);
-      const errorMessage = error.response?.data?.error || 'Failed to fetch tickets. Please try again later.';
+      console.error('Error fetching tickets:', error.response?.data || error.message);
+      const errorMessage = error.response?.data?.message || 'Failed to fetch tickets. Please try again later.';
       setError(errorMessage);
       if (error.response?.status === 401) {
+        setIsAuthenticated(false); // Sync with AuthContext
         navigate('/login');
-      }
-      if (error.response) {
-        console.error('Response error:', error.response.data);
-      } else if (error.request) {
-        console.error('No response received. Check if backend is running.');
       }
     } finally {
       setLoading(false);
     }
-  };
+  }, [isAuthenticated, navigate]);
 
   useEffect(() => {
-    fetchTickets();
-  }, [navigate]);
+    if (!authLoading && isAuthenticated) {
+      fetchTickets();
+    }
+  }, [authLoading, isAuthenticated, fetchTickets]);
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -62,7 +66,7 @@ export const Ticket_table = () => {
     } else {
       const query = searchQuery.toLowerCase();
       const filtered = tickets.filter((ticket) =>
-        ticket.issue.toLowerCase().includes(query)
+        ticket?.issue?.toLowerCase()?.includes(query) || false
       );
       setFilteredTickets(filtered);
     }
@@ -78,8 +82,14 @@ export const Ticket_table = () => {
   };
 
   const handleConfirmDelete = async () => {
+    if (!isAuthenticated) {
+      setError('Please log in to delete tickets');
+      navigate('/login');
+      return;
+    }
+
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
       await axios.delete(`${API_URL}/api/tickets/${selectedIssue._id}`, {
         withCredentials: true,
       });
@@ -88,9 +98,10 @@ export const Ticket_table = () => {
       setFilteredTickets(updatedTickets);
       console.log('Issue deleted:', selectedIssue);
     } catch (error) {
-      console.error('Error deleting ticket:', error.message);
+      console.error('Error deleting ticket:', error);
       setError('Failed to delete ticket. Please try again.');
       if (error.response?.status === 401) {
+        setIsAuthenticated(false); // Sync with AuthContext
         navigate('/login');
       }
     }
@@ -112,6 +123,15 @@ export const Ticket_table = () => {
     setSelectedProductImage(issue.product_image);
     setShowProductImageModal(true);
   };
+
+  if (authLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!isAuthenticated) {
+    navigate('/login');
+    return null;
+  }
 
   return (
     <div className="homepage">
@@ -166,28 +186,30 @@ export const Ticket_table = () => {
             </thead>
             <tbody>
               {filteredTickets.map((issue, index) => (
-                <tr className="hov" key={issue._id}>
+                <tr className="hov" key={issue._id || index}>
                   <td>{index + 1}.</td>
-                  <td>{issue.issue.toUpperCase()}</td>
+                  <td>{issue.issue?.toUpperCase() || 'N/A'}</td>
                   <td className={issue.status === 'resolved' ? 'resolved' : 'not-resolved'}>
-                    {issue.status.toUpperCase()}
+                    {issue.status?.toUpperCase() || 'N/A'}
                   </td>
                   <td>
-                    {new Date(issue.updatedAt).toLocaleString('en-US', {
-                      day: '2-digit',
-                      month: 'short',
-                      year: 'numeric',
-                      hour: 'numeric',
-                      minute: '2-digit',
-                      hour12: true,
-                    }).toUpperCase()}
+                    {issue.updatedAt
+                      ? new Date(issue.updatedAt).toLocaleString('en-US', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit',
+                          hour12: true,
+                        }).toUpperCase()
+                      : 'N/A'}
                   </td>
                   <td>
                     {issue.status !== 'resolved' && (
                       <>
                         <a
                           href={`https://mail.google.com/mail/?view=cm&fs=1&to=mitram.email75@gmail.com&su=${encodeURIComponent(
-                            issue.issue.toUpperCase()
+                            issue.issue?.toUpperCase() || ''
                           )}&body=${encodeURIComponent('Write us Your Problem 😊')}`}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -237,23 +259,20 @@ export const Ticket_table = () => {
           </table>
         )}
         {showModal && (
-          <>
-            {console.log('Modal Visible:', showModal)}
-            <div className="modal-overlay">
-              <div className="modal">
-                <h3>Confirm Delete</h3>
-                <p>Are you sure you want to delete the ticket "{selectedIssue?.issue}"?</p>
-                <div className="modal-actions">
-                  <button onClick={handleConfirmDelete} className="confirm-btn">
-                    Confirm
-                  </button>
-                  <button onClick={handleCancelDelete} className="cancel-btn">
-                    Cancel
-                  </button>
-                </div>
+          <div className="modal-overlay">
+            <div className="modal">
+              <h3>Confirm Delete</h3>
+              <p>Are you sure you want to delete the ticket "{selectedIssue?.issue || 'N/A'}"?</p>
+              <div className="modal-actions">
+                <button onClick={handleConfirmDelete} className="confirm-btn">
+                  Confirm
+                </button>
+                <button onClick={handleCancelDelete} className="cancel-btn">
+                  Cancel
+                </button>
               </div>
             </div>
-          </>
+          </div>
         )}
         {showInvoiceModal && (
           <div className="image-modal">
@@ -263,7 +282,7 @@ export const Ticket_table = () => {
               </span>
               <h3>Invoice Image</h3>
               <img
-                src={`${API_URL}${selectedInvoice}`}
+                src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000'}${selectedInvoice}`}
                 alt="Invoice"
                 className="modal-image"
                 onError={(e) => console.error('Error loading invoice image:', e)}
@@ -279,7 +298,7 @@ export const Ticket_table = () => {
               </span>
               <h3>Product Image</h3>
               <img
-                src={`${API_URL}${selectedProductImage}`}
+                src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000'}${selectedProductImage}`}
                 alt="Product"
                 className="modal-image"
                 onError={(e) => console.error('Error loading product image:', e)}
@@ -291,3 +310,5 @@ export const Ticket_table = () => {
     </div>
   );
 };
+
+// export default Ticket_table;

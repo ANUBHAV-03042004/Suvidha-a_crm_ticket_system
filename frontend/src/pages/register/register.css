@@ -159,6 +159,7 @@
   .container{
     height:400vh !important;
   }
+  #sh-img{display:none !important;}
   .card{
     margin-top: -180vh;
   }
@@ -215,7 +216,7 @@
    height: 250px;
    width: 250px;
    display: block;
-margin: auto;
+margin-top:-370vh !important;
 &:hover{
   transform: scale(1.2);
 }

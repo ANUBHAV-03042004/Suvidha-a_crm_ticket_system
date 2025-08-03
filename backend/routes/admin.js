@@ -5,7 +5,29 @@ import nodemailer from 'nodemailer';
 
 const router = express.Router();
 
-// Middleware to check admin authentication
+// Check admin authentication status
+router.get('/check', isAdminAuthenticated, async (req, res) => {
+  try {
+    console.log('Admin check session:', { sessionID: req.sessionID, user: req.user });
+    const admin = await Admin.findById(req.user._id).select('username email isVerified isAdmin');
+    if (!admin) {
+      console.log('Admin not found for ID:', req.user._id);
+      return res.status(404).json({ error: 'Admin not found' });
+    }
+    res.json({
+      user: {
+        id: admin._id,
+        username: admin.username,
+        email: admin.email,
+        isVerified: admin.isVerified,
+        isAdmin: true,
+      },
+    });
+  } catch (err) {
+    console.error('Error checking admin auth:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
 
 // Get current admin
 router.get('/me', isAdminAuthenticated, async (req, res) => {
@@ -53,7 +75,7 @@ router.put('/me', isAdminAuthenticated, async (req, res) => {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       admin.otp = otp;
       admin.otpExpires = Date.now() + 10 * 60 * 1000;
-      admin.markModified('pendingEmail'); 
+      admin.markModified('pendingEmail');
       console.log('Updating admin with:', { pendingEmail, otp, otpExpires: admin.otpExpires });
       await sendOtpEmail(pendingEmail, otp);
     } else if (email && email === admin.email) {
@@ -152,7 +174,7 @@ const sendOtpEmail = async (email, otp) => {
           <div style="width: 400px; background-color: rgb(19, 13, 13); padding: 20px; border-radius: 8px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); margin: 0 auto; text-align: center;">
             <h2 style="color: white;">Your OTP Code</h2>
             <p style="color: white;">Use the following OTP to verify your new email:</p>
-            <h1 style="background-color: #007bff; color: white; display: inline-block; padding: 10px 20px; border-radius: 5px;">${otp}</h1>
+            <h1 style="background-color: #b782d8; color: white; display: inline-block; padding: 10px 20px; border-radius: 5px;">${otp}</h1>
             <p style="color: white;">This OTP is valid for 10 minutes.</p>
             <p style="color: white;">If you did not request this, please ignore this email.</p>
             <p style="border-top: 1px solid white; font-size: 12px; color: white; margin: 20px 0 0; padding-top: 10px;">© 2025 Suvidha - All Rights Reserved</p>

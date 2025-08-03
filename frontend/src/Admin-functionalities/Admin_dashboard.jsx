@@ -17,18 +17,20 @@ export const AdminDashboard = () => {
     setLoading(true);
     setError('');
     try {
-      // const response = await axios.get('${API_URL}/api/clients', {
-      const API_URL = import.meta.env.API_BASE_URL;
-const response = await axios.get(`${API_URL}/api/clients`,{
-
+      const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+      const response = await axios.get(`${API_URL}/api/clients`, {
         withCredentials: true,
       });
       console.log('Fetched clients:', response.data);
-      setClients(response.data);
-      setFilteredClients(response.data);
+      // Ensure response.data is an array; default to [] if not
+      const clientsData = Array.isArray(response.data) ? response.data : [];
+      setClients(clientsData);
+      setFilteredClients(clientsData);
     } catch (err) {
-      console.error('Error fetching clients:', err);
-      setError('Failed to fetch clients. Please try again.');
+      console.error('Error fetching clients:', err.response?.data || err.message);
+      setError(err.response?.data?.error || 'Failed to fetch clients. Please try again.');
+      setClients([]); // Set to empty array on error
+      setFilteredClients([]);
     } finally {
       setLoading(false);
     }
@@ -46,8 +48,8 @@ const response = await axios.get(`${API_URL}/api/clients`,{
       const query = searchQuery.toLowerCase();
       const filtered = clients.filter(
         (client) =>
-          client.name.toLowerCase().includes(query) ||
-          client.company.toLowerCase().includes(query)
+          client.name?.toLowerCase().includes(query) ||
+          client.company?.toLowerCase().includes(query)
       );
       setFilteredClients(filtered);
     }

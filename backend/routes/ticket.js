@@ -22,27 +22,6 @@ router.get('/', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch tickets' });
   }
 });
-// router.put('/:id', ensureAuthenticated, async (req, res) => {
-//   try {
-//     const { status } = req.body;
-//     if (!status || !['pending', 'resolved'].includes(status)) {
-//       return res.status(400).json({ error: 'Valid status (pending or resolved) is required' });
-//     }
-//     const ticket = await Ticket.findByIdAndUpdate(
-//       req.params.id,
-//       { status, updatedAt: Date.now() },
-//       { new: true }
-//     );
-//     if (!ticket) {
-//       return res.status(404).json({ error: 'Ticket not found' });
-//     }
-//     console.log('Updated ticket:', ticket);
-//     res.json({ message: 'Ticket status updated successfully', ticket });
-//   } catch (error) {
-//     console.error('Error updating ticket:', error);
-//     res.status(500).json({ error: 'Failed to update ticket' });
-//   }
-// });
 
 router.delete('/:id', async (req, res) => {
   try {
