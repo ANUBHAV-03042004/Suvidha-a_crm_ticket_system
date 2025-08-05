@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { AuthContext } from '../context/AuthContext.jsx';
+import { AuthContext } from '../context/AuthContext'; 
 
 export const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -12,7 +12,7 @@ export const AdminLogin = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
-  const { setAuthAfterLogin } = useContext(AuthContext);
+  const { login } = useContext(AuthContext); // Use login from context
   const successMessage = location.state?.message || '';
 
   const handleSubmit = async (e) => {
@@ -28,19 +28,9 @@ export const AdminLogin = () => {
     }
 
     try {
-      console.log('Sending login request with:', { email, password });
-      const response = await axios.post(
-        'http://localhost:4000/api/auth/login/admin',
-        { email, password },
-        { withCredentials: true }
-      );
-      console.log('Login response:', response.data);
-
-      if (response.data.message === 'Admin login successful') {
-        await setAuthAfterLogin('/admin-dashboard', response.data.user, true);
-      } else {
-        setError('Unexpected response from server');
-      }
+      console.log('Sending admin login request with:', { email });
+      await login(email.trim(), password.trim(), '03042004', '/admin-dashboard');
+      console.log('Admin login successful, redirecting to /admin-dashboard');
     } catch (err) {
       console.error('Login error:', {
         status: err.response?.status,
@@ -48,7 +38,6 @@ export const AdminLogin = () => {
         message: err.message,
       });
       setError(err.response?.data?.error || err.message || 'Login failed');
-    } finally {
       setIsLoading(false);
     }
   };

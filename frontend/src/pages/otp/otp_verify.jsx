@@ -18,7 +18,7 @@ export const Otp_Verify = () => {
   const { setAuthAfterLogin } = useAuth();
   const email = state?.email || '';
   const isAdmin = state?.isAdmin || false;
- const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+ const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
   console.log('Otp_Verify state:', { email, isAdmin }); // Debug state
 
   useEffect(() => {
@@ -181,7 +181,7 @@ export const Otp_Verify = () => {
         {isLoading && (
           <LoaderOverlay>
             <LoaderWrapper>
-              <Loader />
+              <Loader/>
             </LoaderWrapper>
           </LoaderOverlay>
         )}

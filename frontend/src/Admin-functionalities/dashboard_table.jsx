@@ -8,7 +8,7 @@ export const Dashboard_Table = ({ clients, fetchClients }) => {
   const [selectedClient, setSelectedClient] = useState(null);
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-
+  const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
   const handleDeleteClick = (client) => {
     setSelectedClient(client);
     setShowModal(true);
@@ -16,7 +16,6 @@ export const Dashboard_Table = ({ clients, fetchClients }) => {
 
   const handleConfirmDelete = async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       await axios.delete(`${API_URL}/api/clients/${selectedClient._id}`, {
         withCredentials: true,
       });
@@ -37,7 +36,6 @@ export const Dashboard_Table = ({ clients, fetchClients }) => {
 
   const openImageModal = (imageUrl) => {
     if (imageUrl) {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       setSelectedImage(`${API_URL}${imageUrl}`);
       setShowImageModal(true);
     } else {

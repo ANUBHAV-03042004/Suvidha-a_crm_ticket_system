@@ -19,7 +19,7 @@ export const Ticket_table = () => {
   const [showProductImageModal, setShowProductImageModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [selectedProductImage, setSelectedProductImage] = useState(null);
-
+ const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
   const fetchTickets = useCallback(async () => {
     if (!isAuthenticated) {
       setError('Please log in to view tickets');
@@ -32,7 +32,6 @@ export const Ticket_table = () => {
     setLoading(true);
     setError(null);
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
       const response = await axios.get(`${API_URL}/api/tickets`, {
         withCredentials: true,
         timeout: 5000,
@@ -89,7 +88,7 @@ export const Ticket_table = () => {
     }
 
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+      const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
       await axios.delete(`${API_URL}/api/tickets/${selectedIssue._id}`, {
         withCredentials: true,
       });
@@ -282,7 +281,7 @@ export const Ticket_table = () => {
               </span>
               <h3>Invoice Image</h3>
               <img
-                src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000'}${selectedInvoice}`}
+                src={`${API_URL}${selectedInvoice}`}
                 alt="Invoice"
                 className="modal-image"
                 onError={(e) => console.error('Error loading invoice image:', e)}
@@ -298,7 +297,7 @@ export const Ticket_table = () => {
               </span>
               <h3>Product Image</h3>
               <img
-                src={`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000'}${selectedProductImage}`}
+                src={`${API_URL}${selectedProductImage}`}
                 alt="Product"
                 className="modal-image"
                 onError={(e) => console.error('Error loading product image:', e)}
@@ -310,5 +309,3 @@ export const Ticket_table = () => {
     </div>
   );
 };
-
-// export default Ticket_table;

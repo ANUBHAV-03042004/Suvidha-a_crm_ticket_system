@@ -14,7 +14,7 @@ export const Reset_Password = () => {
   const { id, token } = useParams();
   const navigate = useNavigate();
   const isAdmin = window.location.pathname.includes('/admin');
-  const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+  const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
 
   const handleValidation = async (e) => {
     e.preventDefault();

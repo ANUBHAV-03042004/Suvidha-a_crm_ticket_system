@@ -12,11 +12,10 @@ export const AdminChats = () => {
   const [showImageModal, setShowImageModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageType, setImageType] = useState(''); // 'invoice' or 'product'
-
+ const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
   // Fetch all tickets
   const fetchTickets = async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.get(`${API_URL}/api/tickets`, {
         withCredentials: true,
       });
@@ -38,7 +37,6 @@ export const AdminChats = () => {
   const toggleStatus = async (ticketId, currentStatus) => {
     const newStatus = currentStatus === 'resolved' ? 'pending' : 'resolved';
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.put(
         `${API_URL}/api/tickets/${ticketId}`,
         { status: newStatus },
@@ -57,7 +55,7 @@ export const AdminChats = () => {
   const clearChat = async (ticketId) => {
     if (window.confirm(`Are you sure you want to clear the chat for ticket ${ticketId}?`)) {
       try {
-        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
         const response = await axios.delete(`${API_URL}/api/tickets/${ticketId}`, {
           withCredentials: true,
         });
@@ -74,7 +72,7 @@ export const AdminChats = () => {
   // Open image modal
   const openImageModal = (imageUrl, type) => {
     if (imageUrl) {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
+      const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
       setSelectedImage(`${API_URL}${imageUrl}`);
       setImageType(type);
       setShowImageModal(true);

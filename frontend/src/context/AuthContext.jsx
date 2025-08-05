@@ -2,7 +2,8 @@ import { createContext, useContext, useEffect, useState, useCallback, useRef } f
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { debounce } from 'lodash';
-import {Loader} from '../home/Loader';
+import { Loader } from '../home/Loader';
+
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -11,10 +12,20 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-  const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
   const lastAuthCheck = useRef({ isAdmin: null, timestamp: 0 });
 
-  // Debounce checkAuth to prevent rapid API calls
+  const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://suvidha-backend-app.azurewebsites.net';
+  console.log('API_URL initialized:', API_URL);
+
+  // Create axios instance for consistent configuration
+  const axiosInstance = axios.create({
+    baseURL: API_URL,
+    withCredentials: true,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
   const checkAuth = useCallback(
     debounce(async (isAdmin) => {
       const now = Date.now();
@@ -22,7 +33,10 @@ export const AuthProvider = ({ children }) => {
         lastAuthCheck.current.isAdmin === isAdmin &&
         now - lastAuthCheck.current.timestamp < 5000
       ) {
-        console.log('Skipping auth check due to recent call:', { isAdmin, timeSinceLast: now - lastAuthCheck.current.timestamp });
+        console.log('Skipping auth check due to recent call:', {
+          isAdmin,
+          timeSinceLast: now - lastAuthCheck.current.timestamp,
+        });
         setIsLoading(false);
         return;
       }
@@ -30,7 +44,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const endpoint = isAdmin ? '/api/admin/check' : '/api/auth/check';
         console.log('Checking auth at:', `${API_URL}${endpoint}`);
-        const response = await axios.get(`${API_URL}${endpoint}`, { withCredentials: true });
+        const response = await axiosInstance.get(endpoint);
         console.log('Auth check response:', response.data);
         setUser(response.data.user);
         setIsAuthenticated(true);
@@ -47,9 +61,6 @@ export const AuthProvider = ({ children }) => {
           '/login/admin',
           '/register',
           '/register/admin',
-          '/otp-verify',
-          '/forgot',
-          '/reset',
         ];
         const currentPath = location.pathname;
         const isPublicRoute = publicRoutes.some((route) => {
@@ -69,23 +80,32 @@ export const AuthProvider = ({ children }) => {
     [navigate, location.pathname, API_URL]
   );
 
-  // Load cached auth state on mount
   useEffect(() => {
     const cachedAuth = localStorage.getItem('authState');
     if (cachedAuth) {
-      const { user, isAuthenticated } = JSON.parse(cachedAuth);
-      console.log('Loaded cached auth state:', { user, isAuthenticated });
-      setUser(user);
-      setIsAuthenticated(isAuthenticated);
-      setIsLoading(false);
+      try {
+        const { user, isAuthenticated } = JSON.parse(cachedAuth);
+        console.log('Loaded cached auth state:', { user, isAuthenticated });
+        if (!user || user === null || typeof user !== 'object') {
+          console.warn('Invalid cached auth state, clearing localStorage');
+          localStorage.removeItem('authState');
+          setIsAuthenticated(false);
+          setUser(null);
+        } else {
+          setUser(user);
+          setIsAuthenticated(isAuthenticated);
+        }
+      } catch (err) {
+        console.error('Error parsing cached auth state:', err);
+        localStorage.removeItem('authState');
+        setIsAuthenticated(false);
+        setUser(null);
+      }
     }
-  }, []);
-
-  // Check auth on pathname change
-  useEffect(() => {
+    // Always verify with server on mount
     const isAdminPage = location.pathname.includes('/admin');
     checkAuth(isAdminPage);
-  }, [location.pathname, checkAuth]);
+  }, [checkAuth, location.pathname]);
 
   const setAuthAfterLogin = useCallback(
     async (redirect, userData, isAdmin = false) => {
@@ -94,8 +114,7 @@ export const AuthProvider = ({ children }) => {
         setUser({ ...userData, isAdmin });
         setIsAuthenticated(true);
         localStorage.setItem('authState', JSON.stringify({ user: { ...userData, isAdmin }, isAuthenticated: true }));
-        // navigate(redirect, { replace: true }); 
-       navigate(redirect || (isAdmin ? '/admin-dashboard' : '/user-dashboard'), { replace: true });
+        navigate(redirect || (isAdmin ? '/admin-dashboard' : '/user-dashboard'), { replace: true });
       } catch (err) {
         console.error('Set auth error:', err);
         throw new Error('Failed to set authentication state');
@@ -104,31 +123,42 @@ export const AuthProvider = ({ children }) => {
     [navigate]
   );
 
-const logout = useCallback(async () => {
+  const login = useCallback(
+    async (email, password, secretCode, redirect) => {
+      try {
+        console.log('Login attempt:', { email, endpoint: secretCode ? '/api/auth/login/admin' : '/api/auth/login' });
+        const endpoint = secretCode ? '/api/auth/login/admin' : '/api/auth/login';
+        const payload = secretCode ? { email, password, secretCode } : { email, password };
+        const response = await axiosInstance.post(endpoint, payload);
+        console.log('Login response:', response.data);
+        await setAuthAfterLogin(redirect, response.data.user, !!secretCode);
+        return response.data;
+      } catch (err) {
+        console.error('Login error:', err.response?.data || err.message);
+        throw new Error(err.response?.data?.error || 'Login failed');
+      }
+    },
+    [setAuthAfterLogin]
+  );
+
+  const logout = useCallback(async () => {
     try {
-      // Use a single logout endpoint for all users
-      await axios.post(
-        `${API_URL}/api/auth/logout`,
-        {},
-        { withCredentials: true }
-      );
+      console.log('Logging out, using API_URL:', API_URL);
+      await axiosInstance.post('/api/auth/logout');
       setUser(null);
       setIsAuthenticated(false);
       localStorage.removeItem('authState');
-      // Navigate based on user type (if user exists)
       navigate(user?.isAdmin ? '/login/admin' : '/login', { replace: true });
     } catch (err) {
       console.error('Logout error:', err.response?.data || err.message);
       throw new Error(err.response?.data?.error || 'Logout failed');
     }
-  }, [navigate, API_URL, user]);
+  }, [user, navigate]);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, setAuthAfterLogin, logout, checkAuth }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, setAuthAfterLogin, login, logout, checkAuth }}>
       {isLoading && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"><Loader/></div>
-        </div>
+          <div><Loader/></div>
       )}
       {children}
     </AuthContext.Provider>

@@ -54,10 +54,6 @@
   transform: scale(1.05);
 }
 
-/* .left-side {
-  margin-left: 2vw;
-} */
-
 .toggle-btn {
   display: none;
   background: none;
@@ -150,16 +146,19 @@
   font-weight: bold;
   text-decoration: none;
 }
-.action.email{
+
+.action.email {
   color: green;
   font-weight: bold;
   text-decoration: none;
 }
-.action.edit{
+
+.action.edit {
   color: rgb(139, 15, 255);
   font-weight: bold;
   text-decoration: none;
 }
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -171,7 +170,7 @@
 }
 
 .modal {
-  margin: 30vh 37vw;
+  margin: 30vh auto;
   background-color: #fff;
   padding: 20px 30px;
   border-radius: 10px;
@@ -200,7 +199,7 @@
 .modal-actions {
   display: flex;
   gap: 5vw;
-  margin-left: 2vw;
+  justify-content: center;
 }
 
 .confirm-btn {
@@ -249,6 +248,8 @@
     width: 100%;
     background-color: #679ef8;
     padding: 10px 0;
+    justify-content: center;
+    align-items: center;
   }
 
   .nav-links.active {
@@ -257,34 +258,47 @@
 
   .nav-links li {
     margin: 10px 0;
-    text-align: center;
   }
 
   .nav-item {
     width: 100%;
+    text-align: center;
   }
 
-  .nav-item button {
+  .nav-item button,
+  .nav-item a {
     width: 100%;
+    display: block;
+    padding: 10px;
   }
 
-  /* .left-side {
-    margin-left: 0;
-  } */
-}
-.content-user {
-    min-height: 90vh;
-    background-color: white;
-    position: relative;
-    z-index: 1;
-    margin-bottom: 1vh;
+  .dropdown-menu {
+    width: 100%;
+    text-align: center;
+    background-color: #679ef8;
   }
+
+  .dropdown-item {
+    color: #222631;
+    padding: 10px;
+  }
+}
+
+.content-user {
+  min-height: 90vh;
+  background-color: white;
+  position: relative;
+  z-index: 1;
+  margin-bottom: 1vh;
+}
+
 @media (max-width: 600px) {
   .nav-links {
-    align-items: stretch;
+    align-items: center;
   }
 
-  .nav-item button {
+  .nav-item button,
+  .nav-item a {
     width: 100%;
   }
 }
@@ -393,4 +407,3 @@
     max-height: 1500px !important;
   }
 }
-

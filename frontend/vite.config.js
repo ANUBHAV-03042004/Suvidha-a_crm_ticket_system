@@ -1,7 +1,7 @@
 // vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
-
+import axios from 'axios';
 export default defineConfig({
   plugins: [react()],
   server: {
@@ -9,7 +9,7 @@ export default defineConfig({
     open: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:4000',
+        target: process.env.VITE_API_BASE_URL ||`https://suvidha-backend-app.azurewebsites.net`,
         changeOrigin: true,
         secure: false,
         credentials: true,
@@ -17,6 +17,7 @@ export default defineConfig({
     },
   },
   define: {
-    'import.meta.env.VITE_API_BASE_URL': JSON.stringify(process.env.VITE_API_BASE_URL || 'http://localhost:4000'),
+    'import.meta.env.VITE_API_BASE_URL': JSON.stringify(process.env.VITE_API_BASE_URL),
   },
+  
 });

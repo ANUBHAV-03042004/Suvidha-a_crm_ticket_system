@@ -32,7 +32,7 @@ export const Header_user_dashboard = () => {
   };
 
   if (loading) {
-    return <Loader />;
+    return <Loader/>;
   }
 
   return (

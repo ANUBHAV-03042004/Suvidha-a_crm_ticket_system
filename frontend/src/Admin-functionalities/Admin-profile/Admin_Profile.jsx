@@ -28,7 +28,7 @@ export const AdminProfile = () => {
   const [successMessage, setSuccessMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-
+ const API_URL = import.meta.env.VITE_API_BASE_URL ||  `https://suvidha-backend-app.azurewebsites.net`;
   // Fetch admin profile on mount
   useEffect(() => {
     const fetchProfile = async () => {
@@ -40,7 +40,6 @@ export const AdminProfile = () => {
       try {
         setLoading(true);
         console.log('Fetching admin profile with user:', user);
-        const API_URL = import.meta.env.VITE_API_BASE_URL;
         const response = await axios.get(`${API_URL}/api/admin/me`, {
           withCredentials: true,
         });
@@ -79,7 +78,6 @@ export const AdminProfile = () => {
         ? { username: name.trim(), pendingEmail: email }
         : { username: name.trim(), email };
       console.log('Sending update payload:', payload);
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.put(
         `${API_URL}/api/admin/me`,
         payload,
@@ -112,7 +110,6 @@ export const AdminProfile = () => {
     }
     try {
       setLoading(true);
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.put(
         `${API_URL}/api/admin/password`,
         { currentPassword, newPassword, confirmPassword },
@@ -135,7 +132,6 @@ export const AdminProfile = () => {
     setSuccessMessage(null);
     try {
       setLoading(true);
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.delete(`${API_URL}/api/admin/me`, {
         withCredentials: true,
       });
@@ -153,7 +149,7 @@ export const AdminProfile = () => {
   };
 
   if (authLoading || loading) {
-    return <Loader />;
+    return <Loader/>;
   }
 
   return (

@@ -1,8 +1,6 @@
-
 import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
-import axios from 'axios';
 import { AuthContext } from '../../context/AuthContext';
 
 export const Login = () => {
@@ -14,8 +12,7 @@ export const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const successMessage = location.state?.message || '';
-  const { setAuthAfterLogin } = useContext(AuthContext);
-  const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+  const { login } = useContext(AuthContext);
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -34,23 +31,16 @@ export const Login = () => {
 
     try {
       console.log('User login attempt:', { email });
-      const response = await axios.post(
-        `${API_URL}/api/auth/login`,
-        { email: email.trim(), password: password.trim() },
-        { withCredentials: true }
-      );
-      console.log('Login response:', response.data);
-      await setAuthAfterLogin(response.data.redirect, response.data.user, false);
+      await login(email.trim(), password.trim(), '', '/user-dashboard');
     } catch (error) {
-      console.error('Login error:', error.response?.data || error.message);
-      const errorMsg = error.response?.data?.error;
-      const details = error.response?.data?.details || '';
-      if (errorMsg === 'Email or password is incorrect') {
-        setError('Incorrect email or password. Please try again or reset your password.');
-      } else if (errorMsg === 'Please verify your email first') {
+      console.error('Login error:', error.message);
+      const errorMsg = error.message;
+      if (errorMsg.includes('User not verified')) {
         setError('Your email is not verified. Please check your email for the OTP.');
+      } else if (errorMsg.includes('Invalid credentials') || errorMsg.includes('Incorrect password')) {
+        setError('Incorrect email or password. Please try again or reset your password.');
       } else {
-        setError(`Login failed: ${errorMsg}${details ? ` (${details})` : ''}. Please try again later.`);
+        setError(`Login failed: ${errorMsg}. Please try again later.`);
       }
     } finally {
       setIsLoading(false);

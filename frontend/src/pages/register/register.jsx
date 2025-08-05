@@ -15,7 +15,7 @@ export const Register = () => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+  const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -116,7 +116,7 @@ export const Register = () => {
         {loading && (
           <LoaderOverlay>
             <RegisterLoader>
-              <Loader />
+              <Loader/>
             </RegisterLoader>
           </LoaderOverlay>
         )}

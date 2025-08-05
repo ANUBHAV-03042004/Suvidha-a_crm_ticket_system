@@ -12,7 +12,7 @@ export const AdminChat = () => {
   const [input, setInput] = useState('');
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
-
+ const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
   // Debug ticketId
   useEffect(() => {
     console.log('Received ticketId from useParams:', ticketId);
@@ -26,7 +26,6 @@ export const AdminChat = () => {
   // Fetch ticket details
   const fetchTicket = useCallback(async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_URL}/api/tickets`);
       if (!response.ok) {
         throw new Error(`Failed to fetch tickets: ${response.status}`);
@@ -51,7 +50,6 @@ export const AdminChat = () => {
   const fetchMessages = useCallback(async (retryCount = 0, maxRetries = 3) => {
     if (!ticketId) return;
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_URL}/api/tickets/messages/${ticketId}`);
       if (!response.ok) {
         throw new Error(`Failed to fetch messages: ${response.status} ${response.statusText}`);
@@ -86,7 +84,6 @@ export const AdminChat = () => {
   const sendReply = async () => {
     if (!input.trim()) return;
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_URL}/api/tickets/send/${ticketId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -116,7 +113,6 @@ export const AdminChat = () => {
   const clearChat = async () => {
     if (window.confirm(`Are you sure you want to clear the chat for ticket ${ticketId}?`)) {
       try {
-        const API_URL = import.meta.env.VITE_API_BASE_URL;
         const response = await fetch(`${API_URL}/api/tickets/delete/${ticketId}`, {
           method: 'DELETE',
         });

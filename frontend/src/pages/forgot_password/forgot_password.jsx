@@ -7,11 +7,10 @@ export const Forgot_Password = () => {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
-
+ const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.post(`${API_URL}/api/auth/forgot`, {
         email,
       }, {
@@ -31,7 +30,6 @@ export const Forgot_Password = () => {
 
   const handleResend = async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.post(`${API_URL}/api/auth/forgot`, {
         email,
       }, {

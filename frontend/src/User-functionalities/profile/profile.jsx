@@ -33,13 +33,12 @@ export const Profile = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
-
+ const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
   // Fetch user details on mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
         console.log('Fetching user with AuthContext:', { user }); // Debug
-        const API_URL = import.meta.env.VITE_API_BASE_URL;
         const response = await axios.get(`${API_URL}/api/users/me`, {
           withCredentials: true,
         });
@@ -88,7 +87,6 @@ export const Profile = () => {
         updateData.email = email;
       }
       console.log('Sending update data:', updateData); // Debug
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       await axios.put(`${API_URL}/api/users/me`, updateData, {
         withCredentials: true,
       });
@@ -119,7 +117,6 @@ export const Profile = () => {
     }
 
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.put(
         `${API_URL}/api/users/password`,
         { currentPassword, newPassword },
@@ -142,7 +139,6 @@ export const Profile = () => {
     setSuccessMessage(null);
 
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       await axios.delete(`${API_URL}/api/users/me`, {
         withCredentials: true,
       });
@@ -158,7 +154,7 @@ export const Profile = () => {
   };
 
   if (loading || !user) {
-    return <Loader />;
+    return <Loader/>;
   }
 
   return (

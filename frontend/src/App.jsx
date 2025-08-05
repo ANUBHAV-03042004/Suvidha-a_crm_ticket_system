@@ -35,7 +35,7 @@ function App() {
       <Route path="/forgot" element={<Forgot_Password />} />
       <Route path="/reset/:id/:token" element={<Reset_Password />} />
       <Route element={<ProtectedRoute isAdminRoute={false} />}>
-        <Route path="/user-dashboard" element={<User_dashboard />} />
+        <Route path="/user-dashboard/*" element={<User_dashboard />} />
         <Route path="/add_new_ticket" element={<Add_new_ticket />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/feedback" element={<Feedback />} />
@@ -46,7 +46,7 @@ function App() {
       <Route path="/register/admin" element={<AdminRegister />} />
       <Route path="/login/admin" element={<AdminLogin />} />
       <Route element={<ProtectedRoute isAdminRoute={true} />}>
-        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/admin-dashboard/*" element={<AdminDashboard />} />
         <Route path="/admin-profile" element={<AdminProfile />} />
         <Route path="/add_new_client" element={<Add_new_client />} />
         <Route path="/client_analytics" element={<Client_Analytics />} />

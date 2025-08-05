@@ -5,7 +5,10 @@ import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import User from '../models/User.js';
 import Admin from '../models/Admin.js';
+import cors from 'cors';
 import { validateRegister, validateVerifyOtp, validateResendOtp, validateAdminRegister } from '../middleware/validate.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const router = express.Router();
 
@@ -60,43 +63,79 @@ router.post('/register', validateRegister, async (req, res) => {
   }
 });
 
+// router.post('/login', (req, res, next) => {
+//   const { email } = req.body;
+//   console.log('Login attempt:', { email, sessionID: req.sessionID });
+//   passport.authenticate('local-user', { session: true }, (err, user, info) => {
+//     if (err) {
+//       console.error('Passport authentication error:', err);
+//       return res.status(500).json({ error: 'Server error' });
+//     }
+//     if (!user) {
+//       console.log('Authentication failed:', info);
+//       if (info.message === 'Missing credentials') {
+//         return res.status(400).json({ error: 'Email and password are required' });
+//       }
+//       if (info.message === 'Incorrect username') {
+//         return res.status(400).json({ error: 'User not found' });
+//       }
+//       if (info.message === 'Incorrect password') {
+//         return res.status(400).json({ error: 'Incorrect password' });
+//       }
+//       if (info.message === 'User not verified') {
+//         return res.status(400).json({ error: 'User not verified' });
+//       }
+//       return res.status(400).json({ error: 'Invalid credentials' });
+//     }
+//     if (!user.isVerified) {
+//       console.log('User not verified:', { email });
+//       return res.status(400).json({ error: 'User not verified' });
+//     }
+//     req.logIn(user, (loginErr) => {
+//       if (loginErr) {
+//         console.error('Login error:', loginErr);
+//         return res.status(500).json({ error: 'Login failed' });
+//       }
+//       console.log('Login successful:', { userId: user._id, email: user.email, isAdmin: user.isAdmin });
+//       return res.status(200).json({
+//         message: 'Login successful',
+//         user: { id: user._id, email: user.email, isAdmin: user.isAdmin || false },
+//       });
+//     });
+//   })(req, res, next);
+// });
+
 router.post('/login', (req, res, next) => {
-  const { email } = req.body;
-  console.log('Login attempt:', { email, sessionID: req.sessionID });
+  console.log('Login attempt:', { email: req.body.email, sessionID: req.sessionID });
+
   passport.authenticate('local-user', { session: true }, (err, user, info) => {
     if (err) {
-      console.error('Passport authentication error:', err);
+      console.error('Authentication error:', err);
       return res.status(500).json({ error: 'Server error' });
     }
     if (!user) {
-      console.log('Authentication failed:', info);
-      if (info.message === 'Missing credentials') {
-        return res.status(400).json({ error: 'Email and password are required' });
-      }
-      if (info.message === 'Incorrect username') {
-        return res.status(400).json({ error: 'User not found' });
-      }
-      if (info.message === 'Incorrect password') {
-        return res.status(400).json({ error: 'Incorrect password' });
-      }
-      if (info.message === 'User not verified') {
-        return res.status(400).json({ error: 'User not verified' });
-      }
-      return res.status(400).json({ error: 'Invalid credentials' });
+      console.log('Auth failed:', info);
+      return res.status(400).json({ error: info.message || 'Invalid credentials' });
     }
-    if (!user.isVerified) {
-      console.log('User not verified:', { email });
-      return res.status(400).json({ error: 'User not verified' });
-    }
-    req.logIn(user, (loginErr) => {
+
+    req.logIn(user, { session: true }, (loginErr) => {
       if (loginErr) {
         console.error('Login error:', loginErr);
         return res.status(500).json({ error: 'Login failed' });
       }
-      console.log('Login successful:', { userId: user._id, email: user.email, isAdmin: user.isAdmin });
-      return res.status(200).json({
-        message: 'Login successful',
-        user: { id: user._id, email: user.email, isAdmin: user.isAdmin || false },
+
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error('Session save error:', saveErr);
+          return res.status(500).json({ error: 'Failed to save session' });
+        }
+        console.log('Session after login:', JSON.stringify(req.session));
+        res.setHeader('Set-Cookie', `connect.sid=${req.sessionID}; Path=/; HttpOnly; Secure; SameSite=None`);
+        return res.status(200).json({
+          message: 'Login successful',
+          user: { id: user._id, email: user.email, isAdmin: user.isAdmin || false },
+          redirect: '/user-dashboard',
+        });
       });
     });
   })(req, res, next);
@@ -230,7 +269,9 @@ router.post('/forgot', async (req, res) => {
     entity.resetPasswordToken = resetToken;
     entity.resetPasswordExpires = Date.now() + 60 * 60 * 1000;
     await entity.save();
-    const resetUrl = `http://localhost:5173/reset/${entity._id}/${resetToken}`;
+    const FRONTEND_URL= process.env.CLIENT_URL || `https://suvidha-36fa1.web.app`;
+    const resetUrl = `${FRONTEND_URL}/reset/${entity._id}/${resetToken}`;
+    // const resetUrl = `http://localhost:5173/reset/${entity._id}/${resetToken}`;
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
@@ -300,22 +341,40 @@ router.post('/reset/:id/:token', async (req, res) => {
   }
 });
 
+// router.get('/check', (req, res) => {
+//   if (req.isAuthenticated()) {
+//     const isAdmin = req.user instanceof Admin;
+//     res.status(200).json({
+//       user: {
+//         id: req.user._id,
+//         email: req.user.email,
+//         isAdmin,
+//       },
+//     });
+//   } else {
+//     res.status(401).json({ error: 'Not authenticated' });
+//   }
+// });
+
 router.get('/check', (req, res) => {
+  console.log('Auth check:', {
+    sessionID: req.sessionID,
+    user: req.user ? req.user.email : 'none',
+    session: JSON.stringify(req.session),
+  });
   if (req.isAuthenticated()) {
-    const isAdmin = req.user instanceof Admin;
-    res.status(200).json({
+    return res.status(200).json({
       user: {
         id: req.user._id,
         email: req.user.email,
-        isAdmin,
+        isAdmin: req.user.isAdmin || false,
       },
     });
-  } else {
-    res.status(401).json({ error: 'Not authenticated' });
   }
+  return res.status(401).json({ error: 'Not authenticated' });
 });
 
-router.get('/check-admin', (req, res) => {
+router.get('/admin/check', (req, res) => {
   res.json({ isAdminAuthenticated: req.isAuthenticated() && req.user?.isAdmin });
 });
 
@@ -366,32 +425,71 @@ router.post('/register/admin', validateAdminRegister, async (req, res) => {
   }
 });
 
+// router.post('/login/admin', (req, res, next) => {
+//   passport.authenticate('local-admin', (err, admin, info) => {
+//     if (err) {
+//       console.error('Authentication error:', err);
+//       return next(err);
+//     }
+//     if (!admin) {
+//       console.log('Admin authentication failed - Info:', info);
+//       return res.status(400).json({ error: info?.message || 'Admin not found' });
+//     }
+//     if (!admin.isVerified) {
+//       console.log('Admin not verified:', admin.email);
+//       return res.status(400).json({ error: 'Admin not verified' });
+//     }
+//     req.logIn(admin, (err) => {
+//       if (err) {
+//         console.error('Login session error:', err);
+//         return res.status(500).json({ error: 'Login failed' });
+//       }
+//       res.status(200).json({
+//         message: 'Admin login successful',
+//         user: { id: admin._id, email: admin.email, isAdmin: true },
+//       });
+//     });
+//   })(req, res, next);
+// });
+
 router.post('/login/admin', (req, res, next) => {
-  passport.authenticate('local-admin', (err, admin, info) => {
+  const { email, password, secretCode } = req.body;
+  console.log('Admin login attempt:', { email, sessionID: req.sessionID });
+  if (secretCode !== process.env.SECRET_CODE) {
+    console.log('Invalid secret code');
+    return res.status(400).json({ error: 'Invalid secret code' });
+  }
+  passport.authenticate('local-admin', { session: true }, (err, admin, info) => {
     if (err) {
-      console.error('Authentication error:', err);
-      return next(err);
+      console.error('Admin auth error:', err);
+      return res.status(500).json({ error: 'Server error' });
     }
     if (!admin) {
-      console.log('Admin authentication failed - Info:', info);
-      return res.status(400).json({ error: info?.message || 'Admin not found' });
+      console.log('Admin auth failed:', info);
+      return res.status(400).json({ error: info.message || 'Invalid credentials' });
     }
-    if (!admin.isVerified) {
-      console.log('Admin not verified:', admin.email);
-      return res.status(400).json({ error: 'Admin not verified' });
-    }
-    req.logIn(admin, (err) => {
-      if (err) {
-        console.error('Login session error:', err);
+    req.logIn(admin, { session: true }, (loginErr) => {
+      if (loginErr) {
+        console.error('Admin login error:', loginErr);
         return res.status(500).json({ error: 'Login failed' });
       }
-      res.status(200).json({
-        message: 'Admin login successful',
-        user: { id: admin._id, email: admin.email, isAdmin: true },
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error('Session save error:', saveErr);
+          return res.status(500).json({ error: 'Failed to save session' });
+        }
+        console.log('Session after admin login:', JSON.stringify(req.session));
+        res.setHeader('Set-Cookie', `connect.sid=${req.sessionID}; Path=/; HttpOnly; Secure; SameSite=None`);
+        return res.status(200).json({
+          message: 'Admin login successful',
+          user: { id: admin._id, email: admin.email, isAdmin: true },
+          redirect: '/admin-dashboard',
+        });
       });
     });
   })(req, res, next);
 });
+
 
 const sendOtpEmail = async (email, otp, isAdmin = false) => {
   const transporter = nodemailer.createTransport({

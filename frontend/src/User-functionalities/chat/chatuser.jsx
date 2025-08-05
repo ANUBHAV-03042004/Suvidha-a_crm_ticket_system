@@ -15,7 +15,7 @@ export const Chatuser = () => {
   const [loading, setLoading] = useState(true);
   const [retryCount, setRetryCount] = useState(0);
   const maxRetries = 3;
-
+const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
   // Debug ticketId
   useEffect(() => {
     console.log('Received ticketId from useParams:', ticketId);
@@ -29,7 +29,6 @@ export const Chatuser = () => {
   // Fetch ticket details
   const fetchTicket = useCallback(async () => {
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_URL}/api/tickets`, {
         credentials: 'include',
       });
@@ -56,7 +55,6 @@ export const Chatuser = () => {
   const fetchMessages = useCallback(async () => {
     if (!ticketId) return;
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_URL}/api/tickets/messages/${ticketId}`, {
         credentials: 'include',
       });
@@ -99,7 +97,6 @@ export const Chatuser = () => {
   const sendMessage = async () => {
     if (!input.trim()) return;
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await fetch(`${API_URL}/api/tickets/send/${ticketId}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -129,7 +126,6 @@ export const Chatuser = () => {
   const clearChat = async () => {
     if (window.confirm('Are you sure you want to clear this chat?')) {
       try {
-        const API_URL = import.meta.env.VITE_API_BASE_URL;
         const response = await fetch(`${API_URL}/api/tickets/delete/${ticketId}`, {
           method: 'DELETE',
           credentials: 'include',
@@ -148,7 +144,7 @@ export const Chatuser = () => {
   };
 
   if (loading) {
-    return <Loader />;
+    return <Loader/>;
   }
 
   if (!ticket) {

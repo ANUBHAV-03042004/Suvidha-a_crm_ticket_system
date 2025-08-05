@@ -3,7 +3,6 @@ import Ticket from '../models/Ticket.js';
 import Chat from '../models/Chat.js';
 import TelegramBot from 'node-telegram-bot-api';
 import dotenv from 'dotenv';
-// import { ensureAuthenticated } from '../middleware/auth.js';
 dotenv.config();
 
 const router = express.Router();

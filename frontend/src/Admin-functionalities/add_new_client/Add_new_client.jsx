@@ -18,7 +18,7 @@ export const Add_new_client = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
-
+    const API_URL = import.meta.env.VITE_API_BASE_URL ||`https://suvidha-backend-app.azurewebsites.net`;
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -71,7 +71,6 @@ export const Add_new_client = () => {
       }
 
       console.log('Submitting client:', Object.fromEntries(data));
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.post(`${API_URL}/api/clients`, data, {
         withCredentials: true,
         headers: { 'Content-Type': 'multipart/form-data' },

@@ -10,7 +10,7 @@ export const Bubblegraph = () => {
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_BASE_URL;
+        const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
         const response = await axios.get(`${API_URL}/api/clients`, {
           withCredentials: true,
         });

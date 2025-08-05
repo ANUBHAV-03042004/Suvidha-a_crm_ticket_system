@@ -1,4 +1,3 @@
-// app.js
 import express from 'express';
 import mongoose from 'mongoose';
 import session from 'express-session';
@@ -16,26 +15,36 @@ import ProfileRoutes from './routes/profile.js';
 import feedbackRoutes from './routes/feedback.js';
 import clientRoutes from './routes/client.js';
 import AdminRoutes from './routes/admin.js';
+
 dotenv.config();
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// CORS setup
-app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-}));
 
+app.set('trust proxy', 1);
+app.use('/Uploads', express.static(path.join(__dirname, 'Uploads')));
+// CORS setup
+app.use(
+  cors({
+    origin: [
+      process.env.CLIENT_URL || 'https://suvidha-36fa1.web.app',
+      'http://localhost:5173',
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    optionsSuccessStatus: 200,
+  })
+);
 // MongoDB connection
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .catch((err) => console.error('MongoDB connection error:', err));
 
 // Middleware
 app.use(express.json());
@@ -43,56 +52,37 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 // Session setup with MongoDB store
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'your-secret-key',
-  resave: false,
-  saveUninitialized: false,
-  store: MongoStore.create({
-    mongoUrl: process.env.MONGO_URI,
-    collectionName: 'sessions',
-    ttl: 50 * 60, // 50 minutes in seconds
-    autoRemove: 'interval', // Use interval-based cleanup
-    autoRemoveInterval: 5, // Check every 5 minute
-  }),
-  cookie: {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    maxAge: 50 * 60 * 1000, // 15 minutes in milliseconds (sync with ttl)
-    sameSite: 'strict',
-  },
-}));
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || '98563fd9ccffee949bd9827cc640cf57a605f69381a2aa09cbf30724923f821b',
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+      collectionName: 'sessions',
+      ttl: 24 * 60 * 60, // 24 hours
+      autoRemove: 'interval',
+      autoRemoveInterval: 10, // Check every 10 minutes
+    }),
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production' ? true : false,
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/',
+    },
+  })
+);
 
-// Custom session middleware to track creation time and enforce timeout
+// Debug session middleware
 app.use((req, res, next) => {
-  // Set creation time for new sessions
-  if (req.sessionID && !req.session.createdAt) {
-    req.session.createdAt = new Date();
-    console.log(`Session created: ${req.sessionID} at ${req.session.createdAt}`);
-  }
-
-  // Check session age and expire if older than 5 minutes
-  if (req.sessionID && req.session.createdAt) {
-    const sessionAge = (new Date() - new Date(req.session.createdAt)) / 1000;
-    if (sessionAge > 300) { // 5 minutes
-      console.log(`Expiring session: ${req.sessionID}, age: ${sessionAge}s`);
-      return req.session.destroy((err) => {
-        if (err) {
-          console.error('Error destroying session:', err);
-          return res.status(500).json({ error: 'Failed to destroy session' });
-        }
-        res.clearCookie('connect.sid', { path: '/', httpOnly: true, sameSite: 'strict' });
-        console.log(`Session destroyed: ${req.sessionID}`);
-        res.status(401).json({ error: 'Session expired, please log in' });
-      });
-    }
-  }
-
-  // Log session destruction
-  const originalSessionDestroy = req.session.destroy;
-  req.session.destroy = function (cb) {
-    console.log(`Session destroyed: ${req.sessionID}`);
-    return originalSessionDestroy.call(this, cb);
-  };
+  console.log(
+    `[${new Date().toISOString()}] ${req.method} ${req.url} - SessionID: ${
+      req.sessionID || 'none'
+    }, User: ${req.user ? req.user.email : 'none'}, Cookies: ${
+      req.headers.cookie || 'none'
+    }, Session: ${JSON.stringify(req.session)}`
+  );
   next();
 });
 
@@ -100,46 +90,15 @@ app.use((req, res, next) => {
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Request logging middleware
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - SessionID: ${req.sessionID || 'none'}`);
-  next();
-});
-
-// Log registered routes
-if (app._router) {
-  app._router.stack.forEach((middleware) => {
-    if (middleware.route) {
-      console.log(`Route registered: ${middleware.route.path} [${Object.keys(middleware.route.methods).join(', ').toUpperCase()}]`);
-    } else if (middleware.name === 'router' && middleware.handle.stack) {
-      middleware.handle.stack.forEach((handler) => {
-        if (handler.route) {
-          console.log(`Route registered: /api${handler.route.path} [${Object.keys(handler.route.methods).join(', ').toUpperCase()}]`);
-        }
-      });
-    }
-  });
-} else {
-  console.warn('Router not initialized, skipping route logging');
-}
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Routes
+app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
 app.use('/api/auth', routes);
-app.use('/api/tickets',TicketRoutes);
+app.use('/api/tickets', TicketRoutes);
 app.use('/api/tickets', Add_new_ticketRoutes);
 app.use('/api/users', ProfileRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/clients', clientRoutes);
-app.use('/api/admin',AdminRoutes);
-// Clear sessions on startup (for testing)
-mongoose.connect(process.env.MONGO_URI)
-  .then(async () => {
-    console.log('MongoDB connected');
-    const db = mongoose.connection.db;
-    await db.collection('sessions').deleteMany({});
-    console.log('Cleared all sessions on startup');
-  })
-  .catch((err) => console.error('MongoDB connection error:', err));
+app.use('/api/admin', AdminRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -150,5 +109,5 @@ app.use((err, req, res, next) => {
 });
 
 // Start server
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

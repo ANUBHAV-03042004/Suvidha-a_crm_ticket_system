@@ -29,8 +29,9 @@ export const AdminRegister = () => {
     }
 
     try {
+     const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
       const response = await axios.post(
-        'http://localhost:4000/api/auth/register/admin',
+        `${API_URL}/api/auth/register/admin`,
         {
           username,
           email,

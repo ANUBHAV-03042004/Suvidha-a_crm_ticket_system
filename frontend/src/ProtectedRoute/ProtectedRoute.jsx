@@ -12,7 +12,7 @@ export const ProtectedRoute = ({ isAdminRoute }) => {
   }, [checkAuth, isAdminRoute]);
 
   if (isLoading) {
-    return <Loader />;
+    return <Loader/>;
   }
 
   if (!isAuthenticated) {

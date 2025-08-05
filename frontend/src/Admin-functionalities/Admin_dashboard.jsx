@@ -11,13 +11,12 @@ export const AdminDashboard = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
+ const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
   // Fetch clients from MongoDB
   const fetchClients = async () => {
     setLoading(true);
     setError('');
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
       const response = await axios.get(`${API_URL}/api/clients`, {
         withCredentials: true,
       });

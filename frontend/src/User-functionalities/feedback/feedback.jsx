@@ -6,7 +6,7 @@ import { Show_Hide } from '../show_hide.jsx';
 import { Rating } from './rating.jsx';
 import './rating.css';
 import trump from '../../assets/img/trump.png';
-import { AuthContext } from '../../context/Authcontext';
+import { AuthContext } from '../../context/AuthContext';
 import axios from 'axios';
 import { Loader } from '../../home/Loader.jsx';
 
@@ -19,14 +19,13 @@ export const Feedback = () => {
   const [comments, setComments] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-
+const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
   // Fetch user data if username or email is missing
   useEffect(() => {
     if (user && (!user.username || !user.email)) {
       const fetchUser = async () => {
         try {
           console.log('Fetching user data for Feedback'); // Debug
-          const API_URL = import.meta.env.VITE_API_BASE_URL;
           const response = await axios.get(`${API_URL}/api/users/me`, {
             withCredentials: true,
           });
@@ -54,7 +53,6 @@ export const Feedback = () => {
 
     try {
       console.log('Submitting feedback:', { username, email, rating, comments });
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.post(
         `${API_URL}/api/feedback/submit`,
         { username, email, rating: Number(rating), comments },
@@ -72,7 +70,7 @@ export const Feedback = () => {
   };
 
   if (loading || !user) {
-    return <Loader />;
+    return <Loader/>;
   }
 
   return (

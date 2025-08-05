@@ -40,6 +40,19 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
 });
 
+// GET: Fetch all tickets for the authenticated user
+router.get('/', ensureAuthenticated, async (req, res) => {
+  try {
+    console.log('GET /api/tickets - User:', req.user?._id || 'No user');
+    const tickets = await Ticket.find({ userId: req.user._id });
+    console.log('Fetched tickets:', tickets.length);
+    res.status(200).json(tickets);
+  } catch (err) {
+    console.error('Error fetching tickets:', { name: err.name, message: err.message });
+    res.status(500).json({ error: 'Server error', details: err.message });
+  }
+});
+
 // GET: Fetch a single ticket by ID
 router.get('/:ticketId', ensureAuthenticated, async (req, res) => {
   try {
@@ -64,6 +77,52 @@ router.get('/:ticketId', ensureAuthenticated, async (req, res) => {
     res.status(500).json({ error: 'Server error', details: error.message });
   }
 });
+
+// POST: Create a new ticket
+router.post(
+  '/',
+  ensureAuthenticated,
+  upload.fields([{ name: 'invoice' }, { name: 'product_image' }]),
+  async (req, res) => {
+    try {
+      console.log('POST /api/tickets - User:', req.user?._id || 'No user', 'Body:', req.body, 'Files:', req.files);
+      const { issue, description } = req.body;
+      if (!issue || !description) {
+        console.log('Missing required fields:', { issue, description });
+        return res.status(400).json({ error: 'Issue and description are required.' });
+      }
+
+      const invoicePath = req.files['invoice']
+        ? `/Uploads/${req.files['invoice'][0].filename}`
+        : null;
+      const productImagePath = req.files['product_image']
+        ? `/Uploads/${req.files['product_image'][0].filename}`
+        : null;
+
+      const newTicket = new Ticket({
+        userId: req.user._id,
+        issue,
+        description,
+        invoice: invoicePath,
+        product_image: productImagePath,
+      });
+
+      const savedTicket = await newTicket.save();
+      console.log('Saved ticket:', savedTicket);
+      res.status(201).json(savedTicket);
+    } catch (err) {
+      console.error('Error saving ticket:', { name: err.name, message: err.message });
+      if (err.message.includes('Only JPEG, JPG, or PNG')) {
+        res.status(400).json({ error: err.message });
+      } else if (err.name === 'ValidationError') {
+        console.log('MongoDB validation error:', err.errors);
+        res.status(400).json({ error: err.message });
+      } else {
+        res.status(500).json({ error: 'Server error', details: err.message });
+      }
+    }
+  }
+);
 
 // PUT: Update a ticket
 router.put(
@@ -124,9 +183,23 @@ router.put(
         ticket.description = description;
       }
 
-      // Update images if provided
-      ticket.invoice = req.files && req.files['invoice'] ? `/Uploads/${req.files['invoice'][0].filename}` : ticket.invoice;
-      ticket.product_image = req.files && req.files['product_image'] ? `/Uploads/${req.files['product_image'][0].filename}` : ticket.product_image;
+      // Update images and delete old files if new ones are uploaded
+      if (req.files && req.files['invoice']) {
+        if (ticket.invoice) {
+          fs.unlink(path.join(__dirname, '..', ticket.invoice), (err) => {
+            if (err) console.error('Error deleting old invoice:', err);
+          });
+        }
+        ticket.invoice = `/Uploads/${req.files['invoice'][0].filename}`;
+      }
+      if (req.files && req.files['product_image']) {
+        if (ticket.product_image) {
+          fs.unlink(path.join(__dirname, '..', ticket.product_image), (err) => {
+            if (err) console.error('Error deleting old product image:', err);
+          });
+        }
+        ticket.product_image = `/Uploads/${req.files['product_image'][0].filename}`;
+      }
       ticket.updatedAt = Date.now();
 
       const updatedTicket = await ticket.save();
@@ -147,5 +220,42 @@ router.put(
     }
   }
 );
+
+// DELETE: Delete a ticket
+router.delete('/:ticketId', ensureAuthenticated, async (req, res) => {
+  try {
+    console.log('DELETE /api/tickets/:ticketId - User:', req.user?._id || 'No user', 'TicketId:', req.params.ticketId);
+    if (!mongoose.Types.ObjectId.isValid(req.params.ticketId)) {
+      console.log('Invalid ticket ID:', req.params.ticketId);
+      return res.status(400).json({ error: 'Invalid ticket ID' });
+    }
+    const ticket = await Ticket.findById(req.params.ticketId);
+    if (!ticket) {
+      console.log('Ticket not found:', req.params.ticketId);
+      return res.status(404).json({ error: 'Ticket not found' });
+    }
+    if (ticket.userId.toString() !== req.user._id.toString() && req.user.isAdmin !== true) {
+      console.log('Unauthorized access:', { ticketUserId: ticket.userId.toString(), userId: req.user._id.toString() });
+      return res.status(403).json({ error: 'Unauthorized: You can only delete your own tickets' });
+    }
+    // Delete associated files
+    if (ticket.invoice) {
+      fs.unlink(path.join(__dirname, '..', ticket.invoice), (err) => {
+        if (err) console.error('Error deleting invoice:', err);
+      });
+    }
+    if (ticket.product_image) {
+      fs.unlink(path.join(__dirname, '..', ticket.product_image), (err) => {
+        if (err) console.error('Error deleting product image:', err);
+      });
+    }
+    await ticket.deleteOne();
+    console.log('Deleted ticket:', req.params.ticketId);
+    res.status(200).json({ message: 'Ticket deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting ticket:', { name: error.name, message: error.message });
+    res.status(500).json({ error: 'Server error', details: error.message });
+  }
+});
 
 export default router;

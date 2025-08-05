@@ -5,6 +5,7 @@ import { Footer_all } from '../home/footer_all.jsx';
 import './add_new_ticket/add_new_ticket.css';
 import { Show_Hide } from './show_hide.jsx';
 import axios from 'axios';
+
 export const Edit_New_Ticket = () => {
   const navigate = useNavigate();
   const { ticketId } = useParams();
@@ -21,18 +22,19 @@ export const Edit_New_Ticket = () => {
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [showProductImageModal, setShowProductImageModal] = useState(false);
 
+  // Define API_URL at component scope
+  const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://suvidha-backend-app.azurewebsites.net';
+
   useEffect(() => {
     const checkSessionAndFetchTicket = async () => {
       try {
         console.log('Checking session for ticketId:', ticketId);
-        const API_URL = import.meta.env.VITE_API_BASE_URL;
         const sessionResponse = await axios.get(`${API_URL}/api/auth/check`, {
           withCredentials: true,
         });
         console.log('Session check response:', sessionResponse.data);
 
         setLoading(true);
-        
         const ticketResponse = await axios.get(`${API_URL}/api/tickets/${ticketId}`, {
           withCredentials: true,
         });
@@ -60,7 +62,7 @@ export const Edit_New_Ticket = () => {
       }
     };
     checkSessionAndFetchTicket();
-  }, [navigate, ticketId]);
+  }, [navigate, ticketId, API_URL]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -105,7 +107,7 @@ export const Edit_New_Ticket = () => {
       if (ticket.product_image && ticket.product_image instanceof File) {
         formData.append('product_image', ticket.product_image);
       }
-const API_URL = import.meta.env.VITE_API_BASE_URL;
+
       const response = await axios.put(`${API_URL}/api/tickets/${ticketId}`, formData, {
         withCredentials: true,
         headers: {
@@ -232,13 +234,20 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
               &times;
             </span>
             <h3>Invoice Image</h3>
-            <img
-            
-              src={`${API_URL}${ticket.invoice}`}
-              alt="Invoice"
-              className="modal-image"
-              onError={(e) => console.error('Error loading invoice image:', e)}
-            />
+            {ticket.invoice ? (
+              <img
+                src={`${API_URL}${ticket.invoice.startsWith('/') ? ticket.invoice : `/${ticket.invoice}`}`}
+                alt="Invoice"
+                className="modal-image"
+                onError={(e) => {
+                  console.error('Error loading invoice image:', { url: e.target.src, error: e.message });
+                  alert('Failed to load invoice image. It may not exist or is inaccessible.');
+                  setShowInvoiceModal(false);
+                }}
+              />
+            ) : (
+              <p>No invoice image available</p>
+            )}
           </div>
         </div>
       )}
@@ -251,12 +260,20 @@ const API_URL = import.meta.env.VITE_API_BASE_URL;
               &times;
             </span>
             <h3>Product Image</h3>
-            <img
-              src={`${API_URL}${ticket.product_image}`}
-              alt="Product"
-              className="modal-image"
-              onError={(e) => console.error('Error loading product image:', e)}
-            />
+            {ticket.product_image ? (
+              <img
+                src={`${API_URL}${ticket.product_image.startsWith('/') ? ticket.product_image : `/${ticket.product_image}`}`}
+                alt="Product"
+                className="modal-image"
+                onError={(e) => {
+                  console.error('Error loading product image:', { url: e.target.src, error: e.message });
+                  alert('Failed to load product image. It may not exist or is inaccessible.');
+                  setShowProductImageModal(false);
+                }}
+              />
+            ) : (
+              <p>No product image available</p>
+            )}
           </div>
         </div>
       )}

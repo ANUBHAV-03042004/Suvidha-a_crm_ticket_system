@@ -20,12 +20,11 @@ export const EditClient = () => {
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
   const { id } = useParams();
-
+ const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
   // Fetch client data on component mount
   useEffect(() => {
     const fetchClient = async () => {
       try {
-        const API_URL = import.meta.env.VITE_API_BASE_URL;
         const response = await axios.get(`${API_URL}/api/clients/${id}`, {
           withCredentials: true,
         });
@@ -101,7 +100,6 @@ export const EditClient = () => {
       }
 
       console.log('Updating client:', Object.fromEntries(data));
-      const API_URL = import.meta.env.VITE_API_BASE_URL;
       const response = await axios.put(`${API_URL}/api/clients/${id}`, data, {
         withCredentials: true,
         headers: { 'Content-Type': 'multipart/form-data' },

@@ -17,4 +17,4 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_SUVIDHA_D080F }}
           channelId: live
-          projectId: suvidha-d080f
+          projectId: suvidha-36fa1
