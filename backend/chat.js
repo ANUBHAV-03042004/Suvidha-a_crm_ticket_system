@@ -4,7 +4,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
-import user_issue from '../frontend/src/assets/user_table.js';
+// import user_issue from '../frontend/src/assets/user_table.js';
 dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,13 +50,13 @@ startPollingWithRetry();
 const chatConfigs = {};
 const messagesByChat = {};
 
-user_issue.forEach((issue) => {
-  chatConfigs[issue.id] = {
-    chatId: defaultChatId, // Verify this
-    issueTitle: issue.issue,
-  };
-  messagesByChat[issue.id] = [];
-});
+// user_issue.forEach((issue) => {
+//   chatConfigs[issue.id] = {
+//     chatId: defaultChatId, // Verify this
+//     issueTitle: issue.issue,
+//   };
+//   messagesByChat[issue.id] = [];
+// });
 
 // Verify bot token
 bot.getMe().then((botInfo) => {
@@ -143,14 +143,14 @@ app.get('/api/all-messages', (req, res) => {
 });
 
 // Get all issues with status (for admin table)
-app.get('/api/issues', (req, res) => {
-  const issues = user_issue.map((issue) => ({
-    id: issue.id,
-    issue: issue.issue,
-    status: issue.status || 'not resolved', // Default to 'not resolved' if missing
-  }));
-  res.json(issues);
-});
+// app.get('/api/issues', (req, res) => {
+//   const issues = user_issue.map((issue) => ({
+//     id: issue.id,
+//     issue: issue.issue,
+//     status: issue.status || 'not resolved', // Default to 'not resolved' if missing
+//   }));
+//   res.json(issues);
+// });
 
 // Chat route (for users)
 app.get('/chat/:issueId', async (req, res) => {
@@ -174,22 +174,12 @@ app.delete('/api/delete/:issueId', (req, res) => {
   res.status(200).send('Chat cleared');
 });
 
-// Test endpoint for chat ID
-app.get('/test-log', (req, res) => {
-  bot.on('message', (msg) => {
-    console.log('Received message:', {
-      chatId: msg.chat.id,
-      chatType: msg.chat.type,
-      text: msg.text,
-      fromUserId: msg.from.id,
-      chatTitle: msg.chat.title || 'N/A',
-    });
-  });
-  res.send('Logging enabled; send a message in a group to see the chat ID');
-});
 
 // Start server
 const PORT = 3000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+

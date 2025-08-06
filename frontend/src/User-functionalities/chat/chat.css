@@ -151,3 +151,18 @@
     width: 100%;
   }
 }
+
+
+.chat-message.admin {
+  text-align: left;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 5px 0;
+}
+.chat-message.user {
+  text-align: right;
+  color: black;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 5px 0;
+}

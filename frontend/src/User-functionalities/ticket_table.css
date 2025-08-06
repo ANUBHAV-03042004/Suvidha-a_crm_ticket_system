@@ -240,33 +240,41 @@
     display: block;
   }
 
-  .nav-links {
-    display: none;
-    flex-direction: column;
-    position: absolute;
-    top: 12vh;
-    left: 0;
-    width: 100%;
-    background-color: #679ef8;
-    padding: 10px 0;
-  }
+ .nav-links {
+  display: none;
+  flex-direction: column;
+  align-items: center; /* <-- Add this */
+  justify-content: center; /* <-- Optional for vertical centering */
+  position: absolute;
+  top: 12vh;
+  left: 0;
+  width: 100%;
+  background-color: #679ef8;
+  padding: 10px 0;
+  text-align: center; /* Ensures links are centered */
+}
 
   .nav-links.active {
     display: flex;
   }
 
-  .nav-links li {
-    margin: 10px 0;
-    text-align: center;
-  }
+.nav-links li {
+  margin: 10px 0;
+  width: 100%;
+  display: flex;
+  justify-content: center; /* Centers each link horizontally */
+}
 
-  .nav-item {
-    width: 100%;
-  }
+ .nav-item {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
 
-  .nav-item button {
-    width: 100%;
-  }
+.nav-item a, .nav-item button {
+  text-align: center;
+  width: 100%;
+}
 
   .left-side {
     margin-left: 0;

@@ -34,6 +34,8 @@ export const Profile = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
  const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
+
+ 
   // Fetch user details on mount
   useEffect(() => {
     const fetchUser = async () => {
