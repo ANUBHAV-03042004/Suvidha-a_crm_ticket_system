@@ -293,59 +293,61 @@
     border-radius: 4px;
     cursor: pointer;
   }
-  
   .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 5000;
-  }
-  
-  .modal {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 400px;
-    text-align: center;
-  }
-  
-  .modal h3 {
-    margin-bottom: 15px;
-  }
-  
-  .modal p {
-    margin-bottom: 20px;
-  }
-  
-  .modal-actions {
-    display: flex;
-    justify-content: space-around;
-  }
-  
-  .confirm-btn,
-  .cancel-btn {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .confirm-btn {
-    background-color: #dc3545;
-    color: white;
-  }
-  
-  .cancel-btn {
-    background-color: #6c757d;
-    color: white;
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.modal h3 {
+  margin-bottom: 15px;
+  font-size: 1.5em;
+}
+
+.modal p {
+  margin-bottom: 20px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.confirm-btn,
+.cancel-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.confirm-btn {
+  background: #dc3545;
+  color: #fff;
+}
+
+.cancel-btn {
+  background: #6c757d;
+  color: #fff;
+}
   
   .image-modal {
     position: fixed;

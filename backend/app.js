@@ -15,7 +15,7 @@ import ProfileRoutes from './routes/profile.js';
 import feedbackRoutes from './routes/feedback.js';
 import clientRoutes from './routes/client.js';
 import AdminRoutes from './routes/admin.js';
-
+import './config/cloudinary.js';
 dotenv.config();
 
 const app = express();
@@ -23,7 +23,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.set('trust proxy', 1);
-app.use('/Uploads', express.static(path.join(__dirname, 'Uploads')));
+// app.use('/Uploads', express.static(path.join(__dirname, 'Uploads')));
 // CORS setup
 app.use(
   cors({
@@ -91,7 +91,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
-app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, 'Uploads')));
 app.use('/api/auth', routes);
 app.use('/api/tickets', TicketRoutes);
 app.use('/api/tickets', Add_new_ticketRoutes);

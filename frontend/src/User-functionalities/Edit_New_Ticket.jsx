@@ -15,14 +15,14 @@ export const Edit_New_Ticket = () => {
     invoice: null,
     product_image: null,
   });
+  const [invoiceFileName, setInvoiceFileName] = useState('');
+  const [productImageFileName, setProductImageFileName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [invoiceInputKey, setInvoiceInputKey] = useState(Date.now());
   const [productImageInputKey, setProductImageInputKey] = useState(Date.now());
   const [showInvoiceModal, setShowInvoiceModal] = useState(false);
   const [showProductImageModal, setShowProductImageModal] = useState(false);
-
-  // Define API_URL at component scope
   const API_URL = import.meta.env.VITE_API_BASE_URL || 'https://suvidha-backend-app.azurewebsites.net';
 
   useEffect(() => {
@@ -45,6 +45,16 @@ export const Edit_New_Ticket = () => {
           invoice: ticketResponse.data.invoice || null,
           product_image: ticketResponse.data.product_image || null,
         });
+        setInvoiceFileName(
+          ticketResponse.data.invoice && typeof ticketResponse.data.invoice === 'string'
+            ? ticketResponse.data.invoice.split('/').pop()
+            : ''
+        );
+        setProductImageFileName(
+          ticketResponse.data.product_image && typeof ticketResponse.data.product_image === 'string'
+            ? ticketResponse.data.product_image.split('/').pop()
+            : ''
+        );
       } catch (err) {
         console.error('Error in session check or ticket fetch:', err.response?.data || err);
         const errorMessage = err.response?.data?.error || 'Failed to load ticket. Please try again.';
@@ -82,8 +92,14 @@ export const Edit_New_Ticket = () => {
     }
     setError(null);
     setTicket((prev) => ({ ...prev, [name]: file }));
-    if (name === 'invoice') setInvoiceInputKey(Date.now());
-    if (name === 'product_image') setProductImageInputKey(Date.now());
+    if (name === 'invoice') {
+      setInvoiceFileName(file ? file.name : '');
+      setInvoiceInputKey(Date.now());
+    }
+    if (name === 'product_image') {
+      setProductImageFileName(file ? file.name : '');
+      setProductImageInputKey(Date.now());
+    }
   };
 
   const updateTicket = async (e) => {
@@ -107,6 +123,7 @@ export const Edit_New_Ticket = () => {
       if (ticket.product_image && ticket.product_image instanceof File) {
         formData.append('product_image', ticket.product_image);
       }
+      console.log('FormData contents:', Array.from(formData.entries()));
 
       const response = await axios.put(`${API_URL}/api/tickets/${ticketId}`, formData, {
         withCredentials: true,
@@ -118,6 +135,10 @@ export const Edit_New_Ticket = () => {
       console.log('Ticket updated:', response.data);
       setLoading(false);
       alert('Ticket updated successfully!');
+      setInvoiceFileName('');
+      setProductImageFileName('');
+      setInvoiceInputKey(Date.now());
+      setProductImageInputKey(Date.now());
       navigate('/user-dashboard');
     } catch (error) {
       console.error('Error updating ticket:', error.response?.data || error);
@@ -180,6 +201,9 @@ export const Edit_New_Ticket = () => {
                     onChange={handleFileChange}
                     key={productImageInputKey}
                   />
+                  {productImageFileName && (
+                    <p className="file-name">Selected: {productImageFileName}</p>
+                  )}
                   {ticket.product_image && !(ticket.product_image instanceof File) && (
                     <div>
                       <button
@@ -187,7 +211,7 @@ export const Edit_New_Ticket = () => {
                         className="view-image-button"
                         onClick={() => setShowProductImageModal(true)}
                       >
-                        View Product Image
+                        View Current Product Image
                       </button>
                     </div>
                   )}
@@ -203,6 +227,9 @@ export const Edit_New_Ticket = () => {
                     onChange={handleFileChange}
                     key={invoiceInputKey}
                   />
+                  {invoiceFileName && (
+                    <p className="file-name">Selected: {invoiceFileName}</p>
+                  )}
                   {ticket.invoice && !(ticket.invoice instanceof File) && (
                     <div>
                       <button
@@ -210,7 +237,7 @@ export const Edit_New_Ticket = () => {
                         className="view-image-button"
                         onClick={() => setShowInvoiceModal(true)}
                       >
-                        View Invoice
+                        View Current Invoice
                       </button>
                     </div>
                   )}
@@ -234,19 +261,23 @@ export const Edit_New_Ticket = () => {
               &times;
             </span>
             <h3>Invoice Image</h3>
-            {ticket.invoice ? (
+            {ticket.invoice && typeof ticket.invoice === 'string' && ticket.invoice.startsWith('https://res.cloudinary.com') ? (
               <img
-                src={`${API_URL}${ticket.invoice.startsWith('/') ? ticket.invoice : `/${ticket.invoice}`}`}
+                src={ticket.invoice}
                 alt="Invoice"
                 className="modal-image"
                 onError={(e) => {
-                  console.error('Error loading invoice image:', { url: e.target.src, error: e.message });
-                  alert('Failed to load invoice image. It may not exist or is inaccessible.');
+                  console.error('Error loading invoice image:', {
+                    url: ticket.invoice,
+                    error: e.message,
+                    stack: e.stack,
+                  });
+                  alert('Failed to load invoice image.');
                   setShowInvoiceModal(false);
                 }}
               />
             ) : (
-              <p>No invoice image available</p>
+              <p>No valid invoice image available</p>
             )}
           </div>
         </div>
@@ -260,19 +291,23 @@ export const Edit_New_Ticket = () => {
               &times;
             </span>
             <h3>Product Image</h3>
-            {ticket.product_image ? (
+            {ticket.product_image && typeof ticket.product_image === 'string' && ticket.product_image.startsWith('https://res.cloudinary.com') ? (
               <img
-                src={`${API_URL}${ticket.product_image.startsWith('/') ? ticket.product_image : `/${ticket.product_image}`}`}
+                src={ticket.product_image}
                 alt="Product"
                 className="modal-image"
                 onError={(e) => {
-                  console.error('Error loading product image:', { url: e.target.src, error: e.message });
-                  alert('Failed to load product image. It may not exist or is inaccessible.');
+                  console.error('Error loading product image:', {
+                    url: ticket.product_image,
+                    error: e.message,
+                    stack: e.stack,
+                  });
+                  alert('Failed to load product image.');
                   setShowProductImageModal(false);
                 }}
               />
             ) : (
-              <p>No product image available</p>
+              <p>No valid product image available</p>
             )}
           </div>
         </div>
