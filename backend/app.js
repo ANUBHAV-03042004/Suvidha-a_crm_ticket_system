@@ -23,7 +23,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.set('trust proxy', 1);
-// app.use('/Uploads', express.static(path.join(__dirname, 'Uploads')));
+
 // CORS setup
 app.use(
   cors({

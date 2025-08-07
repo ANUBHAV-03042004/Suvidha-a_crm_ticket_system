@@ -8,13 +8,6 @@ export const ensureAuthenticated = (req, res, next) => {
   res.redirect('/login');
 };
 
-// export const isAdminAuthenticated = (req, res, next) => {
-//   if (req.isAuthenticated() && req.user.isAdmin) {
-//     return next();
-//   }
-//   console.log('Admin auth failed:', { isAuthenticated: req.isAuthenticated(), isAdmin: req.user?.isAdmin });
-//   res.status(401).json({ error: 'Unauthorized' });
-// };
 
 export const isAdminAuthenticated = (req, res, next) => {
   console.log('Checking admin auth:', {
