@@ -25,3 +25,6 @@ dist-ssr
 
 .env
 node_modules
+# Firebase config
+src/firebase.js
+public/firebase-messaging-sw.js
