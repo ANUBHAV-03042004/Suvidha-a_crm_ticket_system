@@ -76,10 +76,25 @@ router.post('/login', (req, res, next) => {
       return res.status(400).json({ error: info.message || 'Invalid credentials' });
     }
 
-    req.logIn(user, { session: true }, (loginErr) => {
+    req.logIn(user, { session: true }, async (loginErr) => { // Added async
       if (loginErr) {
         console.error('Login error:', loginErr);
         return res.status(500).json({ error: 'Login failed' });
+      }
+
+      // Save FCM token if provided, continue even if it fails
+      if (req.body.fcmToken) {
+        try {
+          await User.findOneAndUpdate(
+            { email: user.email },
+            { fcmToken: req.body.fcmToken },
+            { upsert: true, new: true }
+          );
+          console.log('FCM token saved for user:', req.body.fcmToken);
+        } catch (error) {
+          console.error('Error saving FCM token for user:', error);
+          // Continue login process despite error
+        }
       }
 
       req.session.save((saveErr) => {
@@ -98,6 +113,7 @@ router.post('/login', (req, res, next) => {
     });
   })(req, res, next);
 });
+
 
 router.post('/logout', (req, res) => {
   req.logout(err => {
@@ -369,12 +385,14 @@ router.post('/register/admin', validateAdminRegister, async (req, res) => {
 });
 
 router.post('/login/admin', (req, res, next) => {
-  const { email, password, secretCode } = req.body;
-  console.log('Admin login attempt:', { email, sessionID: req.sessionID });
+  const { email, password, secretCode, fcmToken } = req.body;
+  console.log('Admin login attempt:', { email, sessionID: req.sessionID, fcmToken });
+
   if (secretCode !== process.env.SECRET_CODE) {
     console.log('Invalid secret code');
     return res.status(400).json({ error: 'Invalid secret code' });
   }
+
   passport.authenticate('local-admin', { session: true }, (err, admin, info) => {
     if (err) {
       console.error('Admin auth error:', err);
@@ -384,11 +402,28 @@ router.post('/login/admin', (req, res, next) => {
       console.log('Admin auth failed:', info);
       return res.status(400).json({ error: info.message || 'Invalid credentials' });
     }
-    req.logIn(admin, { session: true }, (loginErr) => {
+
+    req.logIn(admin, { session: true }, async (loginErr) => {
       if (loginErr) {
         console.error('Admin login error:', loginErr);
         return res.status(500).json({ error: 'Login failed' });
       }
+
+      // Save FCM token if provided
+      if (fcmToken) {
+        try {
+          const updatedAdmin = await Admin.findOneAndUpdate(
+            { email: admin.email },
+            { fcmToken },
+            { upsert: true, new: true }
+          );
+          console.log('FCM token saved for admin:', fcmToken, 'Updated admin:', updatedAdmin);
+        } catch (error) {
+          console.error('Error saving FCM token for admin:', error);
+          // Continue login process despite error
+        }
+      }
+
       req.session.save((saveErr) => {
         if (saveErr) {
           console.error('Session save error:', saveErr);
@@ -405,7 +440,6 @@ router.post('/login/admin', (req, res, next) => {
     });
   })(req, res, next);
 });
-
 
 const sendOtpEmail = async (email, otp, isAdmin = false) => {
   const transporter = nodemailer.createTransport({

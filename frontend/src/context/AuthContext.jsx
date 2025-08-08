@@ -55,20 +55,13 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setIsAuthenticated(false);
         localStorage.removeItem('authState');
-        const publicRoutes = [
-          '/',
-          '/login',
-          '/login/admin',
-          '/register',
-          '/register/admin',
-        ];
+        const publicRoutes = ['/', '/login', '/login/admin', '/register', '/register/admin'];
         const currentPath = location.pathname;
-        const isPublicRoute = publicRoutes.some((route) => {
-          if (route === '/reset' || route === '/reset/admin') {
-            return currentPath.startsWith(route);
-          }
-          return currentPath === route;
-        });
+        const isPublicRoute = publicRoutes.some((route) =>
+          route === '/reset' || route === '/reset/admin'
+            ? currentPath.startsWith(route)
+            : currentPath === route
+        );
         if (!isPublicRoute) {
           console.log('No authenticated user/admin, redirecting to:', isAdmin ? '/login/admin' : '/login');
           navigate(isAdmin ? '/login/admin' : '/login', { replace: true });
@@ -102,18 +95,20 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
       }
     }
-    // Always verify with server on mount
     const isAdminPage = location.pathname.includes('/admin');
     checkAuth(isAdminPage);
   }, [checkAuth, location.pathname]);
 
   const setAuthAfterLogin = useCallback(
-    async (redirect, userData, isAdmin = false) => {
+    async (redirect, userData, isAdmin = false, fcmToken = null) => {
       try {
-        console.log('Setting auth after login:', { redirect, user: userData, isAdmin });
+        console.log('Setting auth after login:', { redirect, user: userData, isAdmin, fcmToken });
         setUser({ ...userData, isAdmin });
         setIsAuthenticated(true);
         localStorage.setItem('authState', JSON.stringify({ user: { ...userData, isAdmin }, isAuthenticated: true }));
+        if (fcmToken) {
+          await axiosInstance.post('/api/tickets/save-token', { token: fcmToken });
+        }
         navigate(redirect || (isAdmin ? '/admin-dashboard' : '/user-dashboard'), { replace: true });
       } catch (err) {
         console.error('Set auth error:', err);
@@ -123,24 +118,31 @@ export const AuthProvider = ({ children }) => {
     [navigate]
   );
 
-  const login = useCallback(
-    async (email, password, secretCode, redirect) => {
-      try {
-        console.log('Login attempt:', { email, endpoint: secretCode ? '/api/auth/login/admin' : '/api/auth/login' });
-        const endpoint = secretCode ? '/api/auth/login/admin' : '/api/auth/login';
-        const payload = secretCode ? { email, password, secretCode } : { email, password };
-        const response = await axiosInstance.post(endpoint, payload);
-        console.log('Login response:', response.data);
-        await setAuthAfterLogin(redirect, response.data.user, !!secretCode);
-        return response.data;
-      } catch (err) {
-        console.error('Login error:', err.response?.data || err.message);
-        throw new Error(err.response?.data?.error || 'Login failed');
-      }
-    },
-    [setAuthAfterLogin]
-  );
-
+  
+const login = useCallback(
+  async (email, password, secretCode, redirect, fcmToken = null) => {
+    try {
+      console.log('Login attempt:', { email, endpoint: secretCode ? '/api/auth/login/admin' : '/api/auth/login', fcmToken });
+      const endpoint = secretCode ? '/api/auth/login/admin' : '/api/auth/login';
+      const payload = secretCode ? { email, password, secretCode, fcmToken } : { email, password, fcmToken };
+      const response = await axiosInstance.post(endpoint, payload, {
+        timeout: 10000, // Set a 10-second timeout
+      });
+      console.log('Login response:', response.data);
+      await setAuthAfterLogin(redirect, response.data.user, !!secretCode, fcmToken);
+      return response.data;
+    } catch (err) {
+      console.error('Login error details:', {
+        message: err.message,
+        response: err.response?.data,
+        code: err.code,
+        config: err.config,
+      });
+      throw new Error(err.response?.data?.error || (err.code === 'ECONNABORTED' ? 'Server connection timed out' : 'Login failed'));
+    }
+  },
+  [setAuthAfterLogin]
+);
   const logout = useCallback(async () => {
     try {
       console.log('Logging out, using API_URL:', API_URL);
@@ -156,10 +158,8 @@ export const AuthProvider = ({ children }) => {
   }, [user, navigate]);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, setAuthAfterLogin, login, logout, checkAuth }}>
-      {isLoading && (
-          <div><Loader/></div>
-      )}
+    <AuthContext.Provider value={{ user, isAuthenticated, isLoading, setAuthAfterLogin, login, logout, checkAuth, axiosInstance }}>
+      {isLoading && <div><Loader /></div>}
       {children}
     </AuthContext.Provider>
   );

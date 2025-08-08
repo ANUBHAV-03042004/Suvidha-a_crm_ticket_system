@@ -1,7 +1,8 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import { requestPermissionAndGetToken } from '../../firebase'; // Adjust path as needed
 
 export const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -29,9 +30,17 @@ export const Login = () => {
       return;
     }
 
+    let fcmToken = null;
     try {
-      console.log('User login attempt:', { email });
-      await login(email.trim(), password.trim(), '', '/user-dashboard');
+      fcmToken = await requestPermissionAndGetToken(); // Request FCM token
+    } catch (err) {
+      console.error('Error getting FCM token:', err);
+      // Continue login even if token request fails
+    }
+
+    try {
+      console.log('User login attempt:', { email, fcmToken });
+      await login(email.trim(), password.trim(), '', '/user-dashboard', fcmToken); // Pass fcmToken to login
     } catch (error) {
       console.error('Login error:', error.message);
       const errorMsg = error.message;
@@ -108,7 +117,6 @@ export const Login = () => {
     </StyledWrapper>
   );
 };
-
 const StyledWrapper = styled.div`
   .container {
     width: 100%;

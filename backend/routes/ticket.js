@@ -3,9 +3,71 @@ import Ticket from '../models/Ticket.js';
 import Chat from '../models/Chat.js';
 import TelegramBot from 'node-telegram-bot-api';
 import dotenv from 'dotenv';
+import User from '../models/User.js';
+import Admin from '../models/Admin.js';
+// import FirebaseServiceAccount from '../firebase-service-account.json';
+import admin from 'firebase-admin';
+import { ensureAuthenticated } from '../middleware/auth.js';
+import mongoose from 'mongoose'; 
 dotenv.config();
 
 const router = express.Router();
+// const serviceAccount = FirebaseServiceAccount;
+const serviceAccount = {
+  type: process.env.FIREBASE_TYPE,
+  project_id: process.env.FIREBASE_PROJECT_ID,
+  private_key_id: process.env.FIREBASE_PRIVATE_KEY_ID,
+  private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'), 
+  client_email: process.env.FIREBASE_CLIENT_EMAIL,
+  client_id: process.env.FIREBASE_CLIENT_ID,
+  auth_uri: process.env.FIREBASE_AUTH_URI,
+  token_uri: process.env.FIREBASE_TOKEN_URI,
+  auth_provider_x509_cert_url: process.env.FIREBASE_AUTH_PROVIDER_X509_CERT_URL,
+  client_x509_cert_url: process.env.FIREBASE_CLIENT_X509_CERT_URL,
+  universe_domain: process.env.FIREBASE_UNIVERSE_DOMAIN,
+};
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const sendPushNotification = async (token, title, body) => {
+  try {
+    const message = {
+      token: token,
+      notification: {
+        title: title,
+        body: body, 
+      }
+    };
+    const response = await admin.messaging().send(message);
+    console.log("Push notification sent:", response);
+  } catch (error) {
+    console.error("Push notification error:", error);
+  }
+};
+
+
+router.post("/save-token", ensureAuthenticated, async (req, res) => {
+  const { token } = req.body;
+  if (!token) return res.status(400).send("Token is required");
+
+  try {
+    const user = req.user; // Assuming req.user is set by Passport
+    if (user.isAdmin) {
+      await Admin.findOneAndUpdate({ email: user.email }, { fcmToken: token }, { upsert: true, new: true });
+    } else {
+      await User.findOneAndUpdate({ email: user.email }, { fcmToken: token }, { upsert: true, new: true });
+    }
+    console.log("Saved token:", token, "for", user.email);
+    res.status(200).send("Token saved");
+  } catch (error) {
+    console.error("Error saving token:", error);
+    res.status(500).send("Error saving token");
+  }
+});
+
+
+
 
 // Ticket Routes
 router.get('/', async (req, res) => {
@@ -82,42 +144,6 @@ bot.on('polling_error', (error) => console.error('Polling error:', error));
 // Chat configurations
 
 const chatConfigs = {};
-const initializeChatConfigs = async () => {
-  try {
-    const tickets = await Ticket.find();
-    console.log('Initializing chat configs with tickets:', tickets);
-    tickets.forEach((ticket) => {
-      chatConfigs[ticket._id.toString()] = {
-        chatId: defaultChatId,
-        issueTitle: ticket.issue,
-      };
-    });
-  } catch (error) {
-    console.error('Error initializing chat configs:', error);
-  }
-};
-
-initializeChatConfigs();
-
-// Function to add or update chatConfig for a ticket
-const updateChatConfig = async (ticketId) => {
-  try {
-    const ticket = await Ticket.findById(ticketId);
-    if (!ticket) {
-      console.error(`Ticket not found for ticketId: ${ticketId}`);
-      return false;
-    }
-    chatConfigs[ticketId] = {
-      chatId: defaultChatId,
-      issueTitle: ticket.issue,
-    };
-    console.log(`Updated chatConfig for ticket ${ticketId}`);
-    return true;
-  } catch (error) {
-    console.error(`Error updating chatConfig for ticket ${ticketId}:`, error);
-    return false;
-  }
-};
 
 // Handle incoming Telegram messages
 bot.on('message', async (msg) => {
@@ -146,11 +172,49 @@ bot.on('message', async (msg) => {
     }
   }
 });
-router.post('/send/:ticketId', async (req, res) => {
+
+
+// Inside initializeChatConfigs and updateChatConfig, add userId and adminId
+const initializeChatConfigs = async () => {
+  try {
+    const tickets = await Ticket.find();
+    console.log('Initializing chat configs with tickets:', tickets);
+    tickets.forEach((ticket) => {
+      chatConfigs[ticket._id.toString()] = {
+        chatId: defaultChatId,
+        issueTitle: ticket.issue,
+        userId: ticket.userId.toString(), // Convert ObjectId to string to match Chat.userId
+      };
+    });
+  } catch (error) {
+    console.error('Error initializing chat configs:', error);
+  }
+};
+initializeChatConfigs();
+const updateChatConfig = async (ticketId) => {
+  try {
+    const ticket = await Ticket.findById(ticketId);
+    if (!ticket) {
+      console.error(`Ticket not found for ticketId: ${ticketId}`);
+      return false;
+    }
+    chatConfigs[ticketId] = {
+      chatId: defaultChatId,
+      issueTitle: ticket.issue,
+      userId: ticket.userId.toString(), // Convert ObjectId to string
+    };
+    console.log(`Updated chatConfig for ticket ${ticketId}`);
+    return true;
+  } catch (error) {
+    console.error(`Error updating chatConfig for ticket ${ticketId}:`, error);
+    return false;
+  }
+};
+
+router.post("/send/:ticketId", ensureAuthenticated, async (req, res) => {
   const { ticketId } = req.params;
   const { text, isAdmin = false } = req.body;
 
-  // Check and update chatConfigs if missing
   if (!chatConfigs[ticketId]) {
     const configUpdated = await updateChatConfig(ticketId);
     if (!configUpdated) {
@@ -164,19 +228,50 @@ router.post('/send/:ticketId', async (req, res) => {
     return res.status(400).send('Missing text');
   }
 
-  const { chatId, issueTitle } = chatConfigs[ticketId];
+  const { chatId, issueTitle, userId } = chatConfigs[ticketId];
   const prefixedText = `[${issueTitle}] ${text}`;
 
   try {
     const chat = await Chat.create({
-      userId: isAdmin ? 'Admin' : 'User-aks',
+      userId: isAdmin ? `Admin-${req.user.username || 'Admin'}` : `User-${req.user.username}`,
       message: text,
       ticketId,
       isAdmin,
     });
     await bot.sendMessage(chatId, prefixedText);
     console.log(`Message sent for ticket ${ticketId}`);
-    res.status(200).send('Message sent');
+
+    const currentUser = req.user;
+
+    // Fetch both user and admin recipients
+    const userRecipient = await User.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+    const adminRecipient = await Admin.findOne({ isAdmin: true }).select('email fcmToken'); // Explicitly select fields
+
+    // Notify user if admin sent the message
+    if (isAdmin && userRecipient && userRecipient.fcmToken) {
+      console.log("Notifying user:", userRecipient.email, "with token:", userRecipient.fcmToken);
+      await sendPushNotification(
+        userRecipient.fcmToken,
+        "New Message",
+        `You received a new message from ADMIN-${req.user.username}: ${text.substring(0, 30)}...`
+      );
+    } else if (isAdmin && (!userRecipient || !userRecipient.fcmToken)) {
+      console.warn("No user recipient or token found for ticket:", ticketId);
+    }
+
+    // Notify admin if user sent the message
+    if (!isAdmin && adminRecipient && adminRecipient.fcmToken) {
+      console.log("Notifying admin:", adminRecipient.email, "with token:", adminRecipient.fcmToken);
+      await sendPushNotification(
+        adminRecipient.fcmToken,
+        "New Message",
+        `You received a new message from USER-${req.user.username}: ${text.substring(0, 30)}...`
+      );
+    } else if (!isAdmin && (!adminRecipient || !adminRecipient.fcmToken)) {
+      console.error("No admin recipient or token found for ticket:", ticketId, "Admin:", adminRecipient);
+    }
+
+    res.status(200).send("Message sent");
   } catch (error) {
     console.error(`Error sending message for ticket ${ticketId}:`, error);
     res.status(500).send(`Error sending message: ${error.message}`);

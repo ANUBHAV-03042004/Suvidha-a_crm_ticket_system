@@ -1,8 +1,11 @@
-import React, { useState, useContext } from 'react';
+
+import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
-import { AuthContext } from '../context/AuthContext'; 
+import { AuthContext } from '../context/AuthContext';
+import { requestPermissionAndGetToken } from '../firebase'; // Adjust path as needed
+
 
 export const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -15,7 +18,8 @@ export const AdminLogin = () => {
   const { login } = useContext(AuthContext); // Use login from context
   const successMessage = location.state?.message || '';
 
-  const handleSubmit = async (e) => {
+
+const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
@@ -27,9 +31,18 @@ export const AdminLogin = () => {
       return;
     }
 
+    let fcmToken = null;
     try {
-      console.log('Sending admin login request with:', { email });
-      await login(email.trim(), password.trim(), '03042004', '/admin-dashboard');
+      fcmToken = await requestPermissionAndGetToken();
+      console.log('Fetched FCM token for admin:', fcmToken);
+    } catch (err) {
+      console.error('Error getting FCM token:', err);
+      // Continue login even if token request fails
+    }
+
+    try {
+      console.log('Sending admin login request with:', { email, fcmToken });
+      await login(email.trim(), password.trim(), '03042004', '/admin-dashboard', fcmToken);
       console.log('Admin login successful, redirecting to /admin-dashboard');
     } catch (err) {
       console.error('Login error:', {
@@ -41,7 +54,6 @@ export const AdminLogin = () => {
       setIsLoading(false);
     }
   };
-
   return (
     <div className="main">
       <StyledWrapper $isAdmin={true}>
@@ -130,7 +142,6 @@ export const AdminLogin = () => {
     </div>
   );
 };
-
 const StyledWrapper = styled.div`
   .container {
     display: flex;

@@ -1,5 +1,5 @@
 // src/App.jsx
-import React from 'react';
+import React ,{useEffect}from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { Register } from './pages/register/register';
 import { Homepage } from './home/homepage';
@@ -24,8 +24,42 @@ import { AdminChat } from './Admin-functionalities/Admin-chats/adminchat';
 import { ProtectedRoute } from './ProtectedRoute/ProtectedRoute';
 import { EditClient } from './Admin-functionalities/Editclient';
 import { Edit_New_Ticket } from './User-functionalities/Edit_New_Ticket';
-
+import { requestPermissionAndGetToken, onMessageListener } from "./firebase";
+import { useAuth } from './context/AuthContext';
+import { toast } from "react-toastify";
 function App() {
+const { isAuthenticated, axiosInstance } = useAuth();
+  useEffect(() => {
+  const handleToken = async () => {
+    if(isAuthenticated){
+    const permission = await Notification.requestPermission();
+    console.log(' Push Notification permission:', permission);
+    if (permission === 'granted') {
+      const token = await requestPermissionAndGetToken();
+      if (token && isAuthenticated) {
+        await axiosInstance.post('/api/tickets/save-token', { token });
+        console.log('Token saved successfully');
+      } else if (token) {
+        console.warn('User not authenticated, token not saved yet. Please log in.');
+      }
+    }
+    } else {
+      console.warn('Notification permission denied');
+    }
+  };
+
+  handleToken();
+
+  const messageListener = onMessageListener();
+  messageListener.then(payload => {
+    console.log('Foreground message:', payload);
+    toast(payload.notification.title + " - " + payload.notification.body, {
+      position: "top-right",
+      autoClose: 5000
+    });
+  }).catch(err => console.error('Message listener error:', err));
+}, [isAuthenticated, axiosInstance]);
+
   return (
     <Routes>
       <Route path="/" element={<Homepage />} />

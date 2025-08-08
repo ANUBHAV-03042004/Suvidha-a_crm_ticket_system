@@ -12,6 +12,7 @@ const adminSchema = new mongoose.Schema({
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },
   isAdmin: { type: Boolean, default: true },
+  fcmToken: { type: String }
 });
 
 // Remove any pre-save hooks that might interfere
