@@ -223,6 +223,7 @@ export const User_dashboard = () => {
   );
 };
 
+
 const StyledWrapper = styled.div`
   @media (min-width: 0px) and (max-width: 90px) {
     .input-container-wrapper {

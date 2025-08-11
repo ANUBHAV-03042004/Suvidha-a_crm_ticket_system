@@ -4,6 +4,7 @@ import { AdminFooter } from './Admin_footer.jsx';
 import { Dashboard_Table } from './dashboard_table.jsx';
 import './Admin_dashboard.css';
 import axios from 'axios';
+import { Loader } from '../home/Loader.jsx';
 
 export const AdminDashboard = () => {
   const [clients, setClients] = useState([]);
@@ -118,7 +119,8 @@ export const AdminDashboard = () => {
           </span>
         </div>
       </div>
-      {loading && <p>Loading clients...</p>}
+      {/* {loading && <p>Loading clients...</p>} */}
+        {loading && <Loader/>}
       {error && <p className="error">{error}</p>}
       <Dashboard_Table clients={filteredClients} fetchClients={fetchClients} />
       <AdminFooter />

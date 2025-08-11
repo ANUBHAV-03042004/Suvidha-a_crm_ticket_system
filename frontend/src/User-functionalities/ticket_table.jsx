@@ -1,12 +1,11 @@
-// src/components/ticket_table.jsx
 import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './ticket_table.css';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-
+import Noticket from '../assets/img/noticket.webm';
 export const Ticket_table = () => {
-  const { isAuthenticated, loading: authLoading } = useContext(AuthContext);
+  const { user, isAuthenticated, loading: authLoading } = useContext(AuthContext); // Added user to get logged-in ID
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [selectedIssue, setSelectedIssue] = useState(null);
@@ -19,8 +18,8 @@ export const Ticket_table = () => {
   const [showProductImageModal, setShowProductImageModal] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState(null);
   const [selectedProductImage, setSelectedProductImage] = useState(null);
- const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
- 
+  const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
+
   const fetchTickets = useCallback(async () => {
     if (!isAuthenticated) {
       setError('Please log in to view tickets');
@@ -28,7 +27,7 @@ export const Ticket_table = () => {
       return;
     }
 
-    if (loading) return; // Prevent redundant fetches
+    if (loading) return;
 
     setLoading(true);
     setError(null);
@@ -39,26 +38,29 @@ export const Ticket_table = () => {
       });
       console.log('Fetched tickets:', response.data);
       const ticketsData = Array.isArray(response.data) ? response.data : [];
-      setTickets(ticketsData);
-      setFilteredTickets(ticketsData);
+      // Filter tickets to ensure userId matches the logged-in user's ID
+      const filteredByUser = ticketsData.filter(ticket => 
+        ticket.userId && user?.id && ticket.userId.toString() === user.id.toString()
+      );
+      setTickets(filteredByUser);
+      setFilteredTickets(filteredByUser);
     } catch (error) {
       console.error('Error fetching tickets:', error.response?.data || error.message);
       const errorMessage = error.response?.data?.message || 'Failed to fetch tickets. Please try again later.';
       setError(errorMessage);
       if (error.response?.status === 401) {
-        setIsAuthenticated(false); // Sync with AuthContext
         navigate('/login');
       }
     } finally {
       setLoading(false);
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, user?.id]);
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
       fetchTickets();
     }
-  }, [authLoading, isAuthenticated, fetchTickets]);
+  }, [authLoading, isAuthenticated, fetchTickets, user?.id]);
 
   useEffect(() => {
     if (searchQuery.trim() === '') {
@@ -89,7 +91,6 @@ export const Ticket_table = () => {
     }
 
     try {
-      const API_URL = import.meta.env.VITE_API_BASE_URL || `https://suvidha-backend-app.azurewebsites.net`;
       await axios.delete(`${API_URL}/api/tickets/${selectedIssue._id}`, {
         withCredentials: true,
       });
@@ -101,7 +102,6 @@ export const Ticket_table = () => {
       console.error('Error deleting ticket:', error);
       setError('Failed to delete ticket. Please try again.');
       if (error.response?.status === 401) {
-        setIsAuthenticated(false); // Sync with AuthContext
         navigate('/login');
       }
     }
@@ -172,7 +172,30 @@ export const Ticket_table = () => {
             {error} <button onClick={fetchTickets}>Retry</button>
           </p>
         )}
-        {!loading && !error && filteredTickets.length === 0 && <p>No tickets found.</p>}
+       {
+  !loading && !error && filteredTickets.length === 0 && (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem',
+      color: '#555'
+    }}>
+      <video
+        autoPlay
+        loop
+        muted
+        playsInline
+        style={{ maxWidth: '300px', marginBottom: '1rem' }}
+      >
+        <source src={Noticket} type="video/webm" />
+        Your browser does not support the video tag.
+      </video>
+      <h3>No Tickets Found</h3>
+    </div>
+  )
+}
         {filteredTickets.length > 0 && (
           <table className="issue-table">
             <thead>

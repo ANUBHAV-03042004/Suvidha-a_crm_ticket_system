@@ -5,7 +5,6 @@ import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 import User from '../models/User.js';
 import Admin from '../models/Admin.js';
-import cors from 'cors';
 import { validateRegister, validateVerifyOtp, validateResendOtp, validateAdminRegister } from '../middleware/validate.js';
 import dotenv from 'dotenv';
 dotenv.config();

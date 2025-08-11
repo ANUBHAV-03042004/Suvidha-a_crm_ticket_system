@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import './Admin_dashboard.css';
 import axios from 'axios';
-
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 export const Dashboard_Table = ({ clients, fetchClients }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
@@ -51,7 +51,27 @@ export const Dashboard_Table = ({ clients, fetchClients }) => {
 
   return (
     <div className="table-container">
-      {clients.length === 0 && <p>No clients found.</p>}
+{
+  clients.length === 0 && (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: '2rem',
+      color: '#555'
+    }}>
+      <DotLottieReact
+          src="https://lottie.host/36feb794-a79e-447f-ae48-01bbd03b0d71/MBCsmFkWXj.lottie"
+        loop
+        autoplay
+        style={{ width: '300px', height: '300px' }}
+      />
+      <h3>No Clients Found</h3>
+      <p>It looks like there are no clients in your system yet.</p>
+    </div>
+  )
+}
       {clients.length > 0 && (
         <table className="issue-table">
           <thead>

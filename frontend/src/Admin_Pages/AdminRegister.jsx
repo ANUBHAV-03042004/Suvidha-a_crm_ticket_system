@@ -127,7 +127,7 @@ export const AdminRegister = () => {
                 className="input-field"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                required
+             autoComplete="new-password"  required
               />
               <button
                 type="button"
