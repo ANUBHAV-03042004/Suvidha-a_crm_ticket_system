@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "suvidha-36fa1"
-  }
+    "default": "suvidha-36fa1",
+    "Suvidha": "suvidha-36fa1"
+  },
+  "targets": {},
+  "etags": {}
 }

@@ -6,11 +6,16 @@
     width:70vw;
     height: 45vw; 
     text-align: center;
-    overflow: visible; /* Ensure bubbles aren't clipped */
+    overflow: visible;
+      position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
   }
-  
+
   .bubble-graph {
-    margin-top:15vh;
+    margin-top:10vh;
     height: 30vw; 
     overflow: visible; 
   }
