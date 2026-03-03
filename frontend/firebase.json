@@ -4,6 +4,7 @@
 {
   "hosting": {
     "public": "dist",
+        "site": "suvidha-36fa1",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {

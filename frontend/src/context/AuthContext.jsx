@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setIsAuthenticated(false);
         localStorage.removeItem('authState');
-        const publicRoutes = ['/', '/login', '/login/admin', '/register', '/register/admin'];
+        const publicRoutes = ['/', '/login', '/login/admin', '/register', '/register/admin','/forgot'];
         const currentPath = location.pathname;
         const isPublicRoute = publicRoutes.some((route) =>
           route === '/reset' || route === '/reset/admin'
