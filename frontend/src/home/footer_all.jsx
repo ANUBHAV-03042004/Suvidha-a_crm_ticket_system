@@ -4,7 +4,7 @@ import './homepage.css';
 export const Footer_all = () => {
     return (
         <div className="footer">
-            <p>© 2025 Suvidha - All Rights Reserved</p>
+            <p>© 2026 Suvidha - All Rights Reserved</p>
         </div>
     );
 };
