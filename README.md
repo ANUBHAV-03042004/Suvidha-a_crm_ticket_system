@@ -85,6 +85,8 @@ The Admin panel includes a searchable client dashboard, full CRUD for client rec
 | dotenv | Environment variable management |
 
 ---
+### Database
+
 
 ## 🚀 Local Setup
 
