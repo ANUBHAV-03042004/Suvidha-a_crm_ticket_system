@@ -85,8 +85,12 @@ The Admin panel includes a searchable client dashboard, full CRUD for client rec
 | dotenv | Environment variable management |
 
 ---
-### Database
+## 🗄️ Database Schema
 
+> 🔗 **[View Interactive Schema Diagram →](https://anubhav-03042004.github.io/Suvidha-crm-schema/)**
+
+> The link above opens a live, interactive entity-relationship diagram
+> showing all collections, fields, types, and relationships.
 
 ## 🚀 Local Setup
 
